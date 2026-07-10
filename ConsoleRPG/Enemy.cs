@@ -19,7 +19,7 @@
             Health = health;
         }
 
-        public void GiveReward()
+        private void GiveReward()
         {
             Console.WriteLine($"{this.Name} give {this.GoldReward} gold");
             CharacterData.AddGold(GoldReward);

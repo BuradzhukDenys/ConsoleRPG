@@ -1,7 +1,28 @@
 ﻿namespace ConsoleRPG
 {
-    internal class Game
+    internal sealed class Game
     {
+        enum GameState
+        {
+            SelectCharacterClass,
+            Battle
+        }
+
+        private Game() { }
+        private static Game? _instance;
+        public static Game? Instance
+        {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = new Game();
+                }
+
+                return _instance;
+            }
+        }
+
         private readonly List<string> classes = [
             "1. Warrior",
             "2. Archer",
@@ -12,54 +33,53 @@
         private Enemy? enemy = null;
         private string? playerInput;
 
-        public void SelectCharacterClass()
+        private GameState currentGameState = GameState.SelectCharacterClass;
+        private bool isGameRunning = true;
+
+        private void SelectCharacterClass()
         {
             Console.WriteLine("Select character class");
 
-            while (true)
+            foreach (string characterClass in classes)
             {
-                foreach (string characterClass in classes)
-                {
-                    Console.WriteLine(characterClass);
-                }
-                playerInput = Console.ReadLine()!;
+                Console.WriteLine(characterClass);
+            }
+            playerInput = Console.ReadLine()!;
 
-                switch (playerInput)
-                {
-                    case "1":
-                        character = new Warrior("Warrior", 120, 15);
-                        break;
-                    case "2":
-                        //character = new Archer("Archer", 90, 25);
-                        break;
-                    case "3":
-                        //character = new Wizzard("Wizzard", 60, 35);
-                        break;
-                    default:
-                        Console.Clear();
-                        Console.WriteLine("Invalid choose");
-                        break;
-                }
-
-                if (character != null)
-                {
-                    character.OnCharacterDeath += GameOver;
+            switch (playerInput)
+            {
+                case "1":
+                    character = new Warrior("Warrior", 120, 15);
                     break;
-                }
+                case "2":
+                    //character = new Archer("Archer", 90, 25);
+                    break;
+                case "3":
+                    //character = new Wizzard("Wizzard", 60, 35);
+                    break;
+                default:
+                    Console.Clear();
+                    Console.WriteLine("Invalid choose");
+                    break;
             }
 
-            Console.Clear();
-            Battle();
-        }
-        public void Battle()
-        {
-            while (true)
+            if (character != null)
             {
-                if (enemy == null)
-                {
-                    enemy = new Slime("Slime", 60, 10, 10);
-                }
+                character.OnCharacterDeath += GameOver;
+                Console.Clear();
+                currentGameState = GameState.Battle;
+            }
+        }
+        private void Battle()
+        {
+            if (enemy == null)
+            {
+                enemy = new Slime("Slime", 60, 10, 10);
+            }
 
+            bool isPlayerInputValid = false;
+            while (!isPlayerInputValid)
+            {
                 character!.ShowBattleInfo();
                 CharacterData.ShowGold();
                 Console.WriteLine("------------------------------------------------------------");
@@ -78,41 +98,58 @@
                 {
                     case "1":
                         character.Attack(enemy);
+                        isPlayerInputValid = true;
                         break;
                     case "2":
                         if (!character.Heal())
                         {
                             continue;
                         }
+                        isPlayerInputValid = true;
                         break;
                     default:
                         Console.WriteLine("Invalid action");
-                        break;
+                        continue;
                 }
+            }
 
-                if (enemy != null)
+            if (enemy != null)
+            {
+                if (enemy.IsDead)
                 {
-                    if (enemy.IsDead)
-                    {
-                        enemy = null;
-                    }
-                    else
-                    {
-                        enemy.Attack(character);
-                    }
+                    enemy = null;
+                }
+                else
+                {
+                    enemy.Attack(character);
                 }
             }
         }
 
         public void Start()
         {
-            SelectCharacterClass();
+            while (isGameRunning)
+            {
+                switch (currentGameState)
+                {
+                    case GameState.SelectCharacterClass:
+                        SelectCharacterClass();
+                        break;
+                    case GameState.Battle:
+                        Battle();
+                        break;
+                    default:
+                        Console.WriteLine("Unknown game state");
+                        Environment.Exit(1);
+                        break;
+                }
+            }
         }
 
-        public void GameOver()
+        private void GameOver()
         {
             Console.WriteLine("Game Over!");
-            Environment.Exit(0);
+            isGameRunning = false;
         }
     }
 }

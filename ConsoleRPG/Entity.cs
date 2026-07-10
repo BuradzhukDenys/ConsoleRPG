@@ -7,12 +7,11 @@
         private int _damage;
         private int _maxHealth;
 
-
         public bool IsDead { get; protected set; } = false;
         public string Name
         {
             get { return _name!; }
-            set
+            protected set
             {
                 if (string.IsNullOrWhiteSpace(value))
                 {
@@ -72,10 +71,10 @@
             entity.TakeDamage(Damage);
         }
 
-        protected void TakeDamage(int damage)
+        private void TakeDamage(int damage)
         {
+            Console.WriteLine($"{this.Name} was take damage by {damage} damage and have {this.Health - damage} health");
             this.Health -= damage;
-            Console.WriteLine($"{this.Name} was take damage by {damage} damage and have {this.Health} health");
         }
 
         virtual protected void Die()
