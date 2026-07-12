@@ -8,6 +8,6 @@ namespace ConsoleRPG
 {
     internal interface IUsable
     {
-        public void Use();
+        public bool Use(Character target);
     }
 }

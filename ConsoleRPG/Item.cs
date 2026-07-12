@@ -11,6 +11,7 @@ namespace ConsoleRPG
         private int _count;
         private int _maxCount;
         private string? _name;
+        private int _inventorySlot;
 
         public string? Name
         {
@@ -30,11 +31,11 @@ namespace ConsoleRPG
             get { return _count; }
             set
             {
-                _count = Math.Clamp(value, 1, MaxCount);
+                _count = Math.Clamp(value, 0, MaxCount);
             }
         }
 
-        protected int MaxCount
+        public int MaxCount
         {
             get { return _maxCount; }
             private set
@@ -51,6 +52,14 @@ namespace ConsoleRPG
                 _maxCount = Math.Clamp(value, 1, 100);
             }
         }
+        public int InventorySlot
+        {
+            get { return _inventorySlot; }
+            set
+            {
+                _inventorySlot = Math.Clamp(value, 1, 7);
+            }
+        }
         public bool CanStack { get; private set; } = false;
 
         public Item(string name, int maxCount, int count)
@@ -58,6 +67,21 @@ namespace ConsoleRPG
             Name = name;
             MaxCount = maxCount;
             Count = count;
+        }
+        public void ShowActions()
+        {
+            Console.ForegroundColor = ConsoleColor.DarkMagenta;
+            Console.WriteLine($"{this.Name}:");
+
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            if (this is IUsable)
+            {
+                Console.Write(
+                    $"1. Use\n" +
+                    $"0. Back\n"
+                    );
+            }
+            Console.ResetColor();
         }
     }
 }

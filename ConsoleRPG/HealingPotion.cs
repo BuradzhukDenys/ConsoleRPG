@@ -6,14 +6,22 @@ using System.Threading.Tasks;
 
 namespace ConsoleRPG
 {
-    internal class HealingPotion(string name, int count) : Item(name, count, maxCountPotion), IUsable
+    internal class HealingPotion(int count) : Item("Healing potion", 5, count), IUsable
     {
-        private const int maxCountPotion = 5;
-        private const int duration = 3;
+        public int HealAmount { get; private set; } = 30;
 
-        public void Use()
+        public bool Use(Character target)
         {
+            if (!target.Heal(HealAmount))
+            {
+                return false;
+            }
 
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine($"{Name} used");
+            Console.ResetColor();
+            Count--;
+            return true;
         }
     }
 }
