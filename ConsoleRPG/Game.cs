@@ -1,13 +1,22 @@
-﻿namespace ConsoleRPG
+﻿using static System.Net.Mime.MediaTypeNames;
+
+namespace ConsoleRPG
 {
     internal sealed class Game
     {
         enum GameState
         {
             SelectCharacterClass,
-            Battle
+            Battle,
+            Inventory,
+            ItemAction,
+            Waiting
         }
-
+        enum BattleState
+        {
+            PlayerTurn,
+            EnemyTurn
+        }
         private Game() { }
         private static Game? _instance;
         public static Game? Instance
@@ -34,10 +43,13 @@
         private string? playerInput;
 
         private GameState currentGameState = GameState.SelectCharacterClass;
+        private GameState previousInventoryState = GameState.Battle;
+        private BattleState currentBattleState = BattleState.PlayerTurn;
         private bool isGameRunning = true;
 
         private void SelectCharacterClass()
         {
+            Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("Select character class");
 
             foreach (string characterClass in classes)
@@ -59,7 +71,9 @@
                     break;
                 default:
                     Console.Clear();
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
                     Console.WriteLine("Invalid choose");
+                    Console.ResetColor();
                     break;
             }
 
@@ -67,53 +81,56 @@
             {
                 character.OnCharacterDeath += GameOver;
                 Console.Clear();
-                currentGameState = GameState.Battle;
+                currentGameState = GameState.Waiting; // Test
+                //currentGameState = GameState.Battle;
             }
+            Console.ResetColor();
         }
         private void Battle()
         {
+            currentBattleState = BattleState.PlayerTurn;
+
             if (enemy == null)
             {
                 enemy = new Slime("Slime", 60, 10, 10);
             }
 
-            bool isPlayerInputValid = false;
-            while (!isPlayerInputValid)
+            Console.ResetColor();
+            Console.WriteLine("------------------------------------------------------------");
+            character!.ShowBattleInfo();
+            CharacterData.ShowGold();
+            Console.ResetColor();
+            Console.WriteLine("------------------------------------------------------------");
+            enemy!.ShowBattleInfo();
+            Console.ResetColor();
+            Console.WriteLine("------------------------------------------------------------");
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("Actions:");
+            Console.Write(
+                $"1. Attack\n" +
+                $"2. Open inventory\n"
+                );
+
+            playerInput = Console.ReadLine()!;
+            Console.Clear();
+
+            switch (playerInput)
             {
-                character!.ShowBattleInfo();
-                CharacterData.ShowGold();
-                Console.WriteLine("------------------------------------------------------------");
-                enemy!.ShowBattleInfo();
-                Console.WriteLine("------------------------------------------------------------");
-                Console.WriteLine("Actions:");
-                Console.Write(
-                    $"1. Attack\n" +
-                    $"2. Heal\n"
-                    );
-
-                playerInput = Console.ReadLine()!;
-                Console.Clear();
-
-                switch (playerInput)
-                {
-                    case "1":
-                        character.Attack(enemy);
-                        isPlayerInputValid = true;
-                        break;
-                    case "2":
-                        if (!character.Heal())
-                        {
-                            continue;
-                        }
-                        isPlayerInputValid = true;
-                        break;
-                    default:
-                        Console.WriteLine("Invalid action");
-                        continue;
-                }
+                case "1":
+                    character.Attack(enemy);
+                    currentBattleState = BattleState.EnemyTurn;
+                    break;
+                case "2":
+                    currentGameState = GameState.Inventory;
+                    break;
+                default:
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                    Console.WriteLine("Invalid action");
+                    Console.ResetColor();
+                    break;
             }
 
-            if (enemy != null)
+            if (enemy != null && currentBattleState == BattleState.EnemyTurn)
             {
                 if (enemy.IsDead)
                 {
@@ -121,9 +138,114 @@
                 }
                 else
                 {
-                    enemy.Attack(character);
+                    enemy.Attack(character!);
                 }
             }
+            Console.ResetColor();
+        }
+
+        private void SelectTestField()
+        {
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.Write(
+                $"Select test field:\n" +
+                $"1. Battle\n" +
+                $"2. Inventory test\n"
+                );
+
+            playerInput = Console.ReadLine();
+
+            switch (playerInput)
+            {
+                case "1":
+                    currentGameState = GameState.Battle;
+                    break;
+                case "2":
+                    previousInventoryState = currentGameState;
+                    currentGameState = GameState.Inventory;
+                    break;
+                default:
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                    Console.WriteLine("Unknown test");
+                    Console.ResetColor();
+                    break;
+            }
+            Console.Clear();
+            Console.ResetColor();
+        }
+
+        private void ItemActions()
+        {
+            var item = character?.Inventory.SelectItem(playerInput!);
+            if (item != null)
+            {
+                item.ShowActions();
+            }
+
+            playerInput = Console.ReadLine();
+
+            Console.Clear();
+            switch (playerInput)
+            {
+                case "1":
+                    if (item is IUsable usableItem)
+                    {
+                        if (usableItem.Use(character!))
+                        {
+                            currentGameState = GameState.Inventory;
+                            currentBattleState = BattleState.EnemyTurn;
+                        }
+                        else
+                        {
+                            currentGameState = GameState.Inventory;
+                        }
+                    }
+                    break;
+                case "0":
+                    currentGameState = GameState.Inventory;
+                    break;
+                default:
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                    Console.WriteLine("Unknown command");
+                    Console.ResetColor();
+                    break;
+            }
+            Console.ResetColor();
+        }
+        private void Inventory()
+        {
+            Console.ResetColor();
+            Console.WriteLine("------------------------------------------------------------");
+            character?.Inventory.ShowInventory();
+            Console.ResetColor();
+            Console.WriteLine("------------------------------------------------------------");
+
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.Write(
+                $"0. Close\n" +
+                $"10. Add healing potion\n"
+                );
+
+            playerInput = Console.ReadLine();
+
+            Console.Clear();
+            switch (playerInput)
+            {
+                case "0":
+                    currentGameState = previousInventoryState;
+                    break;
+                case "10":
+                    character?.Inventory.AddItem(new HealingPotion(1));
+                    break;
+                default:
+                    var item = character?.Inventory.SelectItem(playerInput!);
+                    if (item != null)
+                    {
+                        currentGameState = GameState.ItemAction;
+                    }
+                    break;
+            }
+            Console.ResetColor();
         }
 
         public void Start()
@@ -138,8 +260,19 @@
                     case GameState.Battle:
                         Battle();
                         break;
+                    case GameState.Waiting:
+                        SelectTestField();
+                        break;
+                    case GameState.Inventory:
+                        Inventory();
+                        break;
+                    case GameState.ItemAction:
+                        ItemActions();
+                        break;
                     default:
+                        Console.ForegroundColor = ConsoleColor.DarkRed;
                         Console.WriteLine("Unknown game state");
+                        Console.ResetColor();
                         Environment.Exit(1);
                         break;
                 }
@@ -148,7 +281,9 @@
 
         private void GameOver()
         {
+            Console.ForegroundColor = ConsoleColor.DarkRed;
             Console.WriteLine("Game Over!");
+            Console.ResetColor();
             isGameRunning = false;
         }
     }
