@@ -21,8 +21,10 @@
 
         private void GiveReward()
         {
+            Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine($"{this.Name} give {this.GoldReward} gold");
             CharacterData.AddGold(GoldReward);
+            Console.ResetColor();
         }
 
         override protected void Die()

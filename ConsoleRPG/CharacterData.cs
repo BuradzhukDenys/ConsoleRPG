@@ -28,14 +28,18 @@
             }
             else
             {
+                Console.ForegroundColor = ConsoleColor.DarkRed;
                 Console.WriteLine("Not enough gold!");
+                Console.ResetColor();
                 return false;
             }
         }
 
         public static void ShowGold()
         {
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
             Console.WriteLine($"Gold: {Gold}");
+            Console.ResetColor();
         }
     }
 }

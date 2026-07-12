@@ -67,29 +67,39 @@
         }
         virtual public void Attack(Entity entity)
         {
+            Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine($"{this.Name} was attack {entity.Name} by {this.Damage} damage");
             entity.TakeDamage(Damage);
+            Console.ResetColor();
+
         }
 
         private void TakeDamage(int damage)
         {
+            Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine($"{this.Name} was take damage by {damage} damage and have {this.Health - damage} health");
             this.Health -= damage;
+            Console.ResetColor();
+
         }
 
         virtual protected void Die()
         {
             IsDead = true;
+            Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine($"{Name} died");
+            Console.ResetColor();
         }
 
         virtual public void ShowBattleInfo()
         {
-            Console.Write(
-                $"{this.Name}:\n" +
-                $"Health: {this.Health}/{this.MaxHealth}\n" +
-                $"Damage: {this.Damage}\n"
-                );
+            Console.ForegroundColor = ConsoleColor.Magenta;
+            Console.WriteLine($"{this.Name}:");
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"Health: {this.Health}/{this.MaxHealth}");
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"Damage: {this.Damage}");
+            Console.ResetColor();
         }
     }
 }
