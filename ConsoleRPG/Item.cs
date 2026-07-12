@@ -81,7 +81,28 @@ namespace ConsoleRPG
                     $"0. Back\n"
                     );
             }
+            else if (this is IEquipable)
+            {
+                Console.Write(
+                    $"1. Equip\n" +
+                    $"0. Back\n"
+                    );
+            }
             Console.ResetColor();
+        }
+
+        public bool Action(Character character)
+        {
+            if (this is IUsable usableItem)
+            {
+                return usableItem.Use(character);
+            }
+            else if (this is IEquipable equipableItem)
+            {
+                return equipableItem.Equip(character);
+            }
+
+            return false;
         }
     }
 }

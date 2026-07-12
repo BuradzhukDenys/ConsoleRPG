@@ -8,7 +8,7 @@ namespace ConsoleRPG
 {
     internal class Inventory
     {
-        private List<Item> inventory = new();
+        private List<Item> inventory = [];
         private int currentPage = 1;
 
         public void AddItem(Item item)
@@ -36,14 +36,8 @@ namespace ConsoleRPG
                     item.Count = 0;
                     inventory.Remove(item);
                     return;
-                }
+                } 
             }
-        }
-        private void ShowEquipebleItems()
-        {
-            Console.ForegroundColor = ConsoleColor.Magenta;
-            Console.Write(
-                $"Weapon: ");
         }
         public void ShowInventory()
         {
@@ -73,5 +67,10 @@ namespace ConsoleRPG
         {
             return inventory.FirstOrDefault(i => i.InventorySlot == int.Parse(input));
         }
+
+        //public T? SelectItem<T>() where T : Item
+        //{
+        //    return inventory.OfType<T>().FirstOrDefault();
+        //}
     }
 }
