@@ -8,34 +8,70 @@ namespace ConsoleRPG
 {
     internal class Inventory
     {
-        private HashSet<Item> inventory = new();
+        private List<Item> inventory = new();
+        private int currentPage = 1;
 
         public void AddItem(Item item)
         {
-            if (inventory.Equals(item))
+            var searchItem = inventory.FirstOrDefault(
+                i => i.GetType() == item.GetType() &&
+                i.Count < i.MaxCount);
+
+            if (searchItem != null)
             {
-                item.Count++;
+                searchItem.Count++;
             }
             else
             {
+                item.InventorySlot = inventory.Count + 1;
                 inventory.Add(item);
             }
-            inventory = inventory.OrderBy(i => i.Name).ToHashSet();
         }
-
-        public void ShowInventory()
+        private void CheckItemsExist()
         {
-            Console.WriteLine("Inventory:");
-            
             foreach (var item in inventory)
             {
-                Console.Write(item.Name);
+                if (item.Count <= 0)
+                {
+                    item.Count = 0;
+                    inventory.Remove(item);
+                    return;
+                }
+            }
+        }
+        private void ShowEquipebleItems()
+        {
+            Console.ForegroundColor = ConsoleColor.Magenta;
+            Console.Write(
+                $"Weapon: ");
+        }
+        public void ShowInventory()
+        {
+            CheckItemsExist();
+
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("Inventory:");
+            Console.WriteLine($"Page {currentPage}:");
+
+            foreach (var item in inventory)
+            {
+                Console.Write($"{item.InventorySlot}. {item.Name}");
 
                 if (item.CanStack)
                 {
-                    Console.Write($" - X{item.Count}");
+                    Console.Write($" - X{item.Count}\n");
+                }
+                else
+                {
+                    Console.Write(Environment.NewLine);
                 }
             }
+            Console.ResetColor();
+        }
+
+        public Item? SelectItem(string input)
+        {
+            return inventory.FirstOrDefault(i => i.InventorySlot == int.Parse(input));
         }
     }
 }
