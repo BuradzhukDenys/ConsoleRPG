@@ -61,7 +61,7 @@ namespace ConsoleRPG
             switch (playerInput)
             {
                 case "1":
-                    character = new Warrior("Warrior", 120, 15);
+                    character = new Warrior("Warrior", 120);
                     break;
                 case "2":
                     //character = new Archer("Archer", 90, 25);
@@ -188,17 +188,14 @@ namespace ConsoleRPG
             switch (playerInput)
             {
                 case "1":
-                    if (item is IUsable usableItem)
+                    if (item != null && item.Action(character!))
                     {
-                        if (usableItem.Use(character!))
-                        {
-                            currentGameState = GameState.Inventory;
-                            currentBattleState = BattleState.EnemyTurn;
-                        }
-                        else
-                        {
-                            currentGameState = GameState.Inventory;
-                        }
+                        currentGameState = previousInventoryState;
+                        currentBattleState = BattleState.EnemyTurn;
+                    }
+                    else
+                    {
+                        currentGameState = GameState.Inventory;
                     }
                     break;
                 case "0":
@@ -216,6 +213,8 @@ namespace ConsoleRPG
         {
             Console.ResetColor();
             Console.WriteLine("------------------------------------------------------------");
+            character?.ShowEquipedItems();
+            Console.WriteLine("------------------------------------------------------------");
             character?.Inventory.ShowInventory();
             Console.ResetColor();
             Console.WriteLine("------------------------------------------------------------");
@@ -223,6 +222,7 @@ namespace ConsoleRPG
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.Write(
                 $"0. Close\n" +
+                $"9. Add new weapon\n" +
                 $"10. Add healing potion\n"
                 );
 
@@ -233,6 +233,9 @@ namespace ConsoleRPG
             {
                 case "0":
                     currentGameState = previousInventoryState;
+                    break;
+                case "9":
+                    character?.Inventory.AddItem(new UltraHammer());
                     break;
                 case "10":
                     character?.Inventory.AddItem(new HealingPotion(1));
