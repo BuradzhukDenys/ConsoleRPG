@@ -222,6 +222,8 @@ namespace ConsoleRPG
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.Write(
                 $"0. Close\n" +
+                $"20. Add leather armor\n" +
+                $"21. Add god armor\n" +
                 $"9. Add new weapon\n" +
                 $"10. Add healing potion\n"
                 );
@@ -239,6 +241,12 @@ namespace ConsoleRPG
                     break;
                 case "10":
                     character?.Inventory.AddItem(new HealingPotion(1));
+                    break;
+                case "20":
+                    character?.Inventory.AddItem(new LeatherArmor());
+                    break;
+                case "21":
+                    character?.Inventory.AddItem(new GodArmor());
                     break;
                 default:
                     var item = character?.Inventory.SelectItem(playerInput!);

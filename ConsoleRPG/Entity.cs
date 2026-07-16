@@ -6,6 +6,7 @@
         private string? _name;
         private int _damage;
         private int _maxHealth;
+        private double _damageReduction = 0.0;
 
         public bool IsDead { get; protected set; } = false;
         public string Name
@@ -65,6 +66,18 @@
                 _damage = value;
             }
         }
+
+        /// <summary>
+        /// In fraction percent
+        /// </summary>
+        public double DamageReduction
+        {
+            get { return _damageReduction; }
+            set
+            {
+                _damageReduction = Math.Clamp(value, 0, 0.5);
+            }
+        }
         virtual public void Attack(Entity entity)
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
@@ -76,9 +89,11 @@
 
         private void TakeDamage(int damage)
         {
+
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine($"{this.Name} was take damage by {damage} damage and have {this.Health - damage} health");
-            this.Health -= damage;
+            int finaleDamage = (int)(damage - damage * DamageReduction);
+            this.Health -= finaleDamage;
             Console.ResetColor();
 
         }
@@ -99,6 +114,8 @@
             Console.WriteLine($"Health: {this.Health}/{this.MaxHealth}");
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine($"Damage: {this.Damage}");
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine($"Damage reduction: {this.DamageReduction * 100}%");
             Console.ResetColor();
         }
     }
