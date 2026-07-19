@@ -221,11 +221,13 @@ namespace ConsoleRPG
 
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.Write(
+                $"8. Previous page\n" +
+                $"9. Next page\n" +
                 $"0. Close\n" +
                 $"20. Add leather armor\n" +
                 $"21. Add god armor\n" +
-                $"9. Add new weapon\n" +
-                $"10. Add healing potion\n"
+                $"22. Add new weapon\n" +
+                $"23. Add healing potion\n"
                 );
 
             playerInput = Console.ReadLine();
@@ -233,20 +235,26 @@ namespace ConsoleRPG
             Console.Clear();
             switch (playerInput)
             {
-                case "0":
-                    currentGameState = previousInventoryState;
+                case "8":
+                    character?.Inventory.PreviousPage();
                     break;
                 case "9":
-                    character?.Inventory.AddItem(new UltraHammer());
+                    character?.Inventory.NextPage();
                     break;
-                case "10":
-                    character?.Inventory.AddItem(new HealingPotion(1));
+                case "0":
+                    currentGameState = previousInventoryState;
                     break;
                 case "20":
                     character?.Inventory.AddItem(new LeatherArmor());
                     break;
                 case "21":
                     character?.Inventory.AddItem(new GodArmor());
+                    break;
+                case "22":
+                    character?.Inventory.AddItem(new UltraHammer());
+                    break;
+                case "23":
+                    character?.Inventory.AddItem(new HealingPotion(1));
                     break;
                 default:
                     var item = character?.Inventory.SelectItem(playerInput!);
