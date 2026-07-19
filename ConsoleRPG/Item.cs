@@ -11,7 +11,6 @@ namespace ConsoleRPG
         private int _count;
         private int _maxCount;
         private string? _name;
-        private int _inventorySlot;
 
         public string? Name
         {
@@ -40,24 +39,9 @@ namespace ConsoleRPG
             get { return _maxCount; }
             private set
             {
-                if (value == 1)
-                {
-                    CanStack = false;
-                }
-                else
-                {
-                    CanStack = true;
-                }
+                CanStack = value > 1;
 
                 _maxCount = Math.Clamp(value, 1, 100);
-            }
-        }
-        public int InventorySlot
-        {
-            get { return _inventorySlot; }
-            set
-            {
-                _inventorySlot = Math.Clamp(value, 1, 7);
             }
         }
         public bool CanStack { get; private set; } = false;
