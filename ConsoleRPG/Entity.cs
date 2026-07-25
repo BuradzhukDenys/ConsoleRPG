@@ -4,7 +4,7 @@
     {
         private int _health;
         private string? _name;
-        private int _damage;
+        private int _damage = 0;
         private int _maxHealth;
         private double _damageReduction = 0.0;
 

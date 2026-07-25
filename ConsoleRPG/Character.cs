@@ -51,7 +51,7 @@
             OnCharacterDeath?.Invoke();
         }
 
-        public bool EquipWeapon(Weapon newWeapon)
+        virtual public bool EquipWeapon(Weapon newWeapon)
         {
             if (CurrentWeapon.GetType() == newWeapon.GetType())
             {
@@ -81,11 +81,11 @@
             CurrentArmor = newArmor;
             DamageReduction = CurrentArmor.DamageReduction;
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($"{this.Name} equiped {newArmor.Name}, and have {this.Damage} damage");
+            Console.WriteLine($"{this.Name} equiped {newArmor.Name}, and have {this.DamageReduction} damage reduction");
             Console.ResetColor();
             return true;
         }
-        public void ShowEquipedItems()
+        virtual public void ShowEquipedItems()
         {
             Console.ForegroundColor = ConsoleColor.Magenta;
             Console.WriteLine($"Equiped items:");
