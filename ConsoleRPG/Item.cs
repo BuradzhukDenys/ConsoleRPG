@@ -41,7 +41,7 @@ namespace ConsoleRPG
             {
                 CanStack = value > 1;
 
-                _maxCount = Math.Clamp(value, 1, 100);
+                _maxCount = Math.Clamp(value, 1, 99);
             }
         }
         public bool CanStack { get; private set; } = false;

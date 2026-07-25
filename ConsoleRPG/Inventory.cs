@@ -20,7 +20,7 @@ namespace ConsoleRPG
 
             if (searchItem != null)
             {
-                searchItem.Count++;
+                searchItem.Count += item.Count;
             }
             else
             {
@@ -89,6 +89,14 @@ namespace ConsoleRPG
         {
             currentPage = Math.Clamp(currentPage - 1, 1, 999);
         }
+        public bool CheckAmmos(string AmmoName)
+        {
+            Ammo? selectedAmmo = (Ammo?)inventory.FirstOrDefault(item => item.Name == AmmoName);
+
+            return selectedAmmo != null;
+        }
+
+
         //public T? SelectItem<T>() where T : Item
         //{
         //    return inventory.OfType<T>().FirstOrDefault();
