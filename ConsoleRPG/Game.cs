@@ -64,7 +64,7 @@ namespace ConsoleRPG
                     character = new Warrior("Warrior", 120);
                     break;
                 case "2":
-                    //character = new Archer("Archer", 90, 25);
+                    character = new Archer("Archer", 100);
                     break;
                 case "3":
                     //character = new Wizzard("Wizzard", 60, 35);
@@ -227,7 +227,10 @@ namespace ConsoleRPG
                 $"20. Add leather armor\n" +
                 $"21. Add god armor\n" +
                 $"22. Add new weapon\n" +
-                $"23. Add healing potion\n"
+                $"23. Add healing potion\n" +
+                $"25. Add new bow\n" +
+                $"24. Add arrow(X10)\n" +
+                $"26. Add god arrow(X10)\n"
                 );
 
             playerInput = Console.ReadLine();
@@ -255,6 +258,15 @@ namespace ConsoleRPG
                     break;
                 case "23":
                     character?.Inventory.AddItem(new HealingPotion(1));
+                    break;
+                case "24":
+                    character?.Inventory.AddItem(new Arrow(10));
+                    break;
+                case "25":
+                    character?.Inventory.AddItem(new GodBow());
+                    break;
+                case "26":
+                    character?.Inventory.AddItem(new GodArrow(10));
                     break;
                 default:
                     var item = character?.Inventory.SelectItem(playerInput!);
