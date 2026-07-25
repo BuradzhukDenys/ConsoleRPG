@@ -10,6 +10,7 @@ namespace ConsoleRPG
     {
         private List<Item> inventory = [];
         private int currentPage = 1;
+        private const int ItemsPerPage = 7;
 
         public void AddItem(Item item)
         {
@@ -23,33 +24,36 @@ namespace ConsoleRPG
             }
             else
             {
-                item.InventorySlot = inventory.Count + 1;
                 inventory.Add(item);
             }
         }
         private void CheckItemsExist()
         {
-            foreach (var item in inventory)
-            {
-                if (item.Count <= 0)
-                {
-                    item.Count = 0;
-                    inventory.Remove(item);
-                    return;
-                } 
-            }
+            inventory.RemoveAll(item => item.Count <= 0);
         }
         public void ShowInventory()
         {
             CheckItemsExist();
 
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine("Inventory:");
-            Console.WriteLine($"Page {currentPage}:");
+            int totalPages = (int)Math.Ceiling((double)inventory.Count / ItemsPerPage);
+            if (totalPages == 0) totalPages = 1;
 
-            foreach (var item in inventory)
+            if (currentPage > totalPages) currentPage = totalPages;
+
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine($"Inventory: (Page {currentPage}/{totalPages}):");
+
+            var itemsOnPage = inventory
+                .Skip((currentPage - 1) * ItemsPerPage)
+                .Take(ItemsPerPage)
+                .ToList();
+
+            for (int i = 0; i < itemsOnPage.Count; i++)
             {
-                Console.Write($"{item.InventorySlot}. {item.Name}");
+                var item = itemsOnPage[i];
+                int displaySlot = i + 1;
+
+                Console.Write($"{displaySlot}. {item.Name}");
 
                 if (item.CanStack)
                 {
@@ -65,9 +69,26 @@ namespace ConsoleRPG
 
         public Item? SelectItem(string input)
         {
-            return inventory.FirstOrDefault(i => i.InventorySlot == int.Parse(input));
+            if (int.TryParse(input, out int slot) && slot >= 1 && slot <= ItemsPerPage)
+            {
+                int realIndex = (currentPage - 1) * ItemsPerPage + (slot - 1);
+
+                if (realIndex >= 0 && realIndex < inventory.Count)
+                {
+                    return inventory[realIndex];
+                }
+            }
+            return null;
         }
 
+        public void NextPage()
+        {
+            currentPage = Math.Clamp(currentPage + 1, 1, 999);
+        }
+        public void PreviousPage()
+        {
+            currentPage = Math.Clamp(currentPage - 1, 1, 999);
+        }
         //public T? SelectItem<T>() where T : Item
         //{
         //    return inventory.OfType<T>().FirstOrDefault();
