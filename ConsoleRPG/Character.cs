@@ -6,7 +6,7 @@
         public Inventory Inventory { get; private set; } = new();
         public Weapon CurrentWeapon { get; private set; }
         public Armor? CurrentArmor { get; private set; }
-        public Character(string name, int health, Weapon startWeapon) //First save initialize constructor
+        protected Character(string name, int health, Weapon startWeapon) //First save initialize constructor
         {
             Name = name;
             MaxHealth = health;
@@ -16,7 +16,7 @@
             Inventory.AddItem(CurrentWeapon!);
         }
 
-        public Character(string name, int health, int maxHealth, Weapon startWeapon, Armor startArmor) //Constructor for load from file
+        protected Character(string name, int health, int maxHealth, Weapon startWeapon, Armor startArmor) //Constructor for load from file
         {
             Name = name;
             MaxHealth = maxHealth;

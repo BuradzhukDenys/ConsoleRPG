@@ -39,6 +39,7 @@ namespace ConsoleRPG
             ];
 
         private Character? character = null;
+        private Location location = new Forest();
         private Enemy? enemy = null;
         private string? playerInput;
 
@@ -150,7 +151,8 @@ namespace ConsoleRPG
             Console.Write(
                 $"Select test field:\n" +
                 $"1. Battle\n" +
-                $"2. Inventory test\n"
+                $"2. Inventory test\n" +
+                $"3. Map test\n"
                 );
 
             playerInput = Console.ReadLine();
@@ -163,6 +165,9 @@ namespace ConsoleRPG
                 case "2":
                     previousInventoryState = currentGameState;
                     currentGameState = GameState.Inventory;
+                    break;
+                case "3":
+                    location.Start();
                     break;
                 default:
                     Console.ForegroundColor = ConsoleColor.DarkRed;
