@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace ConsoleRPG
 {
-    internal class Archer : Character
+    internal class Archer : Character, IHasAmmo
     {
+        public IRangedWeapon? ArcherWeapon => CurrentWeapon as IRangedWeapon;
         public Ammo? CurrentAmmo
         {
             get;
@@ -15,7 +16,7 @@ namespace ConsoleRPG
         }
         public Archer(string name, int health) : base(name, health, new WoodenBow())
         {
-            CurrentAmmo = new Arrow(15);
+            CurrentAmmo = new Arrow(1);
             Damage = (int)Math.Ceiling((double)CurrentWeapon.Damage * CurrentAmmo.DamageMultiplier);
             Inventory.AddItem(CurrentAmmo);
         }
@@ -44,31 +45,42 @@ namespace ConsoleRPG
         }
         public override void Attack(Entity entity)
         {
-            if (CurrentAmmo == null || CurrentAmmo.Name == null)
+            if (CurrentWeapon is not IRangedWeapon)
             {
+                Console.ForegroundColor = ConsoleColor.DarkRed;
+                Console.WriteLine("You can't attack without ranged weapon!");
+                Console.ResetColor();
                 return;
             }
 
-            if (CurrentWeapon is IRangedWeapon rangedWeapon && rangedWeapon.CheckAmmos(this, CurrentAmmo.Name))
+            if (CurrentAmmo != null)
             {
-                CurrentAmmo.Count--;
-                base.Attack(entity);
+                if (CurrentAmmo.Count > 0)
+                {
+                    CurrentAmmo.Count--;
+                    base.Attack(entity);
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine($"You consume 1 {CurrentAmmo.Name}");
+                }
+
+                if (CurrentAmmo.Count <= 0)
+                {
+                    CurrentAmmo = null;
+                    Console.WriteLine("You are out of ammo!");
+                    Attack(entity, ArcherWeapon.MeleeDamage);
+                }
             }
             else
             {
-                Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.WriteLine($"You don't have ammo");
-                Console.ResetColor();
+                Attack(entity, ArcherWeapon.MeleeDamage);
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine($"You attack {entity.Name} by melee attack");
             }
-
-            if (CurrentAmmo.Count <= 0)
-            {
-                CurrentAmmo = null;
-            }
+            Console.ResetColor();
         }
         public override bool EquipWeapon(Weapon newWeapon)
         {
-            if (newWeapon is IRangedWeapon)
+            if (newWeapon is IRangedWeapon rangedWeapon)
             {
                 return base.EquipWeapon(newWeapon);
             }
@@ -81,6 +93,13 @@ namespace ConsoleRPG
 
             Console.ForegroundColor = ConsoleColor.Magenta;
             Console.WriteLine($"Ammo: {(CurrentAmmo != null ? this.CurrentAmmo.Name : "None")}");
+            Console.ResetColor();
+        }
+        public override void ShowBattleInfo()
+        {
+            base.ShowBattleInfo();
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"Melee damage: {ArcherWeapon.MeleeDamage}");
             Console.ResetColor();
         }
     }

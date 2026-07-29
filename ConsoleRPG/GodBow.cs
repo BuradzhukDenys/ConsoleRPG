@@ -8,6 +8,7 @@ namespace ConsoleRPG
 {
     internal class GodBow : Weapon, IRangedWeapon
     {
+        public int MeleeDamage => 250;
         public GodBow() : base("God bow")
         {
             Damage = 1000;

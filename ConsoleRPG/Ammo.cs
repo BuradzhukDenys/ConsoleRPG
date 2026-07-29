@@ -19,9 +19,9 @@ namespace ConsoleRPG
         }
         public bool Equip(Character character)
         {
-            if (character is Archer archer)
+            if (character is IHasAmmo hero)
             {
-                return archer.EquipAmmo(this);
+                return hero.EquipAmmo(this);
             }
 
             return false;
