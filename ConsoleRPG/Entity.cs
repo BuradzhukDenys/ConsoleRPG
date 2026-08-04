@@ -7,6 +7,7 @@
         private int _damage = 0;
         private int _maxHealth;
         private double _damageReduction = 0.0;
+        private List<Effect> effects = [];
 
         public bool IsDead { get; protected set; } = false;
         public string Name
@@ -84,18 +85,21 @@
             Console.WriteLine($"{this.Name} was attack {entity.Name} by {this.Damage} damage");
             entity.TakeDamage(Damage);
             Console.ResetColor();
-
         }
-
-        private void TakeDamage(int damage)
+        virtual public void Attack(Entity entity, int damage)
         {
-
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($"{this.Name} was take damage by {damage} damage and have {this.Health - damage} health");
+            Console.WriteLine($"{this.Name} was attack {entity.Name} by {damage} damage");
+            entity.TakeDamage(damage);
+            Console.ResetColor();
+        }
+        public void TakeDamage(int damage)
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
             int finaleDamage = (int)(damage - damage * DamageReduction);
             this.Health -= finaleDamage;
+            Console.WriteLine($"{this.Name} was take damage by {finaleDamage} damage and have {this.Health} health");
             Console.ResetColor();
-
         }
 
         virtual protected void Die()
@@ -110,6 +114,36 @@
         {
             Console.ForegroundColor = ConsoleColor.Magenta;
             Console.WriteLine($"{this.Name}:");
+            Console.ForegroundColor = ConsoleColor.Cyan;
+
+            if (effects.Count > 0)
+            {
+                Console.WriteLine("Effects: ");
+                for (int i = 0; i < effects.Count; i++)
+                {
+                    Console.Write($"{effects[i].Name} ({effects[i].Duration} turns)");
+
+                    if (i < effects.Count - 1)
+                    {
+                        Console.Write(", ");
+                    }
+
+                    if ((i + 1) % 4 == 0)
+                    {
+                        Console.Write(Environment.NewLine);
+                    }
+
+                }
+                if (effects.Count % 4 != 0)
+                {
+                    Console.Write(Environment.NewLine);
+                }
+            }
+            else
+            {
+                Console.WriteLine("Effects: None");
+            }
+
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"Health: {this.Health}/{this.MaxHealth}");
             Console.ForegroundColor = ConsoleColor.Red;
@@ -117,6 +151,21 @@
             Console.ForegroundColor = ConsoleColor.DarkGray;
             Console.WriteLine($"Damage reduction: {this.DamageReduction * 100}%");
             Console.ResetColor();
+        }
+        public void AddEffect(Effect newEffect)
+        {
+            effects.Add(newEffect);
+
+            newEffect.InitializeMessage(this);
+        }
+        public void ApplyEffects()
+        {
+            foreach (var effect in effects)
+            {
+                effect.Apply(this);
+            }
+
+            effects.RemoveAll(effect => effect.Duration <= 0);
         }
     }
 }

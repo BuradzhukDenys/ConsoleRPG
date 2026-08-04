@@ -90,6 +90,7 @@ namespace ConsoleRPG
         private void Battle()
         {
             currentBattleState = BattleState.PlayerTurn;
+            character?.ApplyEffects();
 
             if (enemy == null)
             {
@@ -109,7 +110,9 @@ namespace ConsoleRPG
             Console.WriteLine("Actions:");
             Console.Write(
                 $"1. Attack\n" +
-                $"2. Open inventory\n"
+                $"2. Open inventory\n" +
+                $"3. Give burn effect to enemy\n" +
+                $"4. Wait\n"
                 );
 
             playerInput = Console.ReadLine()!;
@@ -124,6 +127,12 @@ namespace ConsoleRPG
                 case "2":
                     currentGameState = GameState.Inventory;
                     break;
+                case "3":
+                    enemy?.AddEffect(new BurnEffect(5));
+                    break;
+                case "4":
+                    currentBattleState = BattleState.EnemyTurn;
+                    break;
                 default:
                     Console.ForegroundColor = ConsoleColor.DarkRed;
                     Console.WriteLine("Invalid action");
@@ -133,6 +142,7 @@ namespace ConsoleRPG
 
             if (enemy != null && currentBattleState == BattleState.EnemyTurn)
             {
+                enemy.ApplyEffects();
                 if (enemy.IsDead)
                 {
                     enemy = null;

@@ -67,12 +67,12 @@ namespace ConsoleRPG
                 {
                     CurrentAmmo = null;
                     Console.WriteLine("You are out of ammo!");
-                    Attack(entity, ArcherWeapon.MeleeDamage);
+                    Attack(entity, ArcherWeapon!.MeleeDamage);
                 }
             }
             else
             {
-                Attack(entity, ArcherWeapon.MeleeDamage);
+                Attack(entity, ArcherWeapon!.MeleeDamage);
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine($"You attack {entity.Name} by melee attack");
             }
@@ -99,7 +99,7 @@ namespace ConsoleRPG
         {
             base.ShowBattleInfo();
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"Melee damage: {ArcherWeapon.MeleeDamage}");
+            Console.WriteLine($"Melee damage: {ArcherWeapon?.MeleeDamage}");
             Console.ResetColor();
         }
     }
