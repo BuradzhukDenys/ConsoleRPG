@@ -20,8 +20,8 @@ namespace ConsoleRPG
             Damage = (int)Math.Ceiling((double)CurrentWeapon.Damage * CurrentAmmo.DamageMultiplier);
             Inventory.AddItem(CurrentAmmo);
         }
-        public Archer(string name, int health, int maxHealth, Weapon startWeapon, Armor startArmor, Ammo EquipedAmmo)
-            : base(name, health, maxHealth, startWeapon, startArmor)
+        public Archer(string name, int health, int maxHealth, Weapon startWeapon, Armor startArmor, Amulet startAmulet, Ammo EquipedAmmo)
+            : base(name, health, maxHealth, startWeapon, startArmor, startAmulet)
         {
             CurrentAmmo = EquipedAmmo;
             Damage = (int)Math.Ceiling((double)CurrentWeapon.Damage * CurrentAmmo.DamageMultiplier);

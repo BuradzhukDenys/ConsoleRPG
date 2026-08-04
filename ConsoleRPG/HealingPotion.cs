@@ -23,5 +23,11 @@ namespace ConsoleRPG
             Count--;
             return true;
         }
+        public override void ShowInfo()
+        {
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine($"Heal {HealAmount} health");
+            Console.ResetColor();
+        }
     }
 }

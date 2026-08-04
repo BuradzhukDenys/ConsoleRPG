@@ -14,5 +14,11 @@ namespace ConsoleRPG
         {
             return character.EquipWeapon(this);
         }
+        public override void ShowInfo()
+        {
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine($"Damage: {Damage}");
+            Console.ResetColor();
+        }
     }
 }

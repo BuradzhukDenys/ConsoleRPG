@@ -52,6 +52,7 @@ namespace ConsoleRPG
             MaxCount = maxCount;
             Count = count;
         }
+        public abstract void ShowInfo();
         public void ShowActions()
         {
             Console.ForegroundColor = ConsoleColor.DarkMagenta;

@@ -17,10 +17,6 @@ namespace ConsoleRPG
         }
         public override void Action(Entity target)
         {
-            //Console.ForegroundColor = ConsoleColor.Yellow;
-            //Console.WriteLine($"{target.Name} are burning, and take {_damage} damage");
-            //Console.ResetColor();
-
             target.TakeDamage(_damage);
         }
     }

@@ -7,7 +7,7 @@
         private int _damage = 0;
         private int _maxHealth;
         private double _damageReduction = 0.0;
-        private List<Effect> effects = [];
+        private readonly List<Effect> effects = [];
 
         public bool IsDead { get; protected set; } = false;
         public string Name
@@ -134,6 +134,7 @@
                     }
 
                 }
+
                 if (effects.Count % 4 != 0)
                 {
                     Console.Write(Environment.NewLine);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ConsoleRPG
 {
@@ -15,6 +16,12 @@ namespace ConsoleRPG
         public bool Equip(Character character)
         {
             return character.EquipArmor(this);
+        }
+        public override void ShowInfo()
+        {
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine($"Damage reduction: {DamageReduction}");
+            Console.ResetColor();
         }
     }
 }
