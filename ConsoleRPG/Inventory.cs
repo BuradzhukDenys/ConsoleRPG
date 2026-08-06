@@ -89,12 +89,12 @@ namespace ConsoleRPG
         {
             currentPage = Math.Clamp(currentPage - 1, 1, 999);
         }
-        public bool CheckAmmos(string AmmoName)
-        {
-            Ammo? selectedAmmo = (Ammo?)inventory.FirstOrDefault(item => item.Name == AmmoName);
+        //public bool CheckAmmos(string AmmoName)
+        //{
+        //    Ammo? selectedAmmo = (Ammo?)inventory.FirstOrDefault(item => item.Name == AmmoName);
 
-            return selectedAmmo != null;
-        }
+        //    return selectedAmmo != null;
+        //}
 
 
         //public T? SelectItem<T>() where T : Item

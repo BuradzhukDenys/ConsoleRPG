@@ -1,4 +1,6 @@
-﻿namespace ConsoleRPG
+﻿using System;
+
+namespace ConsoleRPG
 {
     internal abstract class Character : Entity
     {
@@ -6,6 +8,7 @@
         public Inventory Inventory { get; private set; } = new();
         public Weapon CurrentWeapon { get; private set; }
         public Armor? CurrentArmor { get; private set; }
+        public Amulet? CurrentAmulet { get; private set; }
         protected Character(string name, int health, Weapon startWeapon) //First save initialize constructor
         {
             Name = name;
@@ -16,13 +19,14 @@
             Inventory.AddItem(CurrentWeapon!);
         }
 
-        protected Character(string name, int health, int maxHealth, Weapon startWeapon, Armor startArmor) //Constructor for load from file
+        protected Character(string name, int health, int maxHealth, Weapon startWeapon, Armor startArmor, Amulet startAmulet) //Constructor for load from file
         {
             Name = name;
             MaxHealth = maxHealth;
             Health = health;
             CurrentWeapon = startWeapon;
             CurrentArmor = startArmor;
+            CurrentAmulet = startAmulet;
             Damage = CurrentWeapon.Damage;
             DamageReduction = CurrentArmor.DamageReduction;
         }
@@ -43,7 +47,26 @@
 
             return true;
         }
+        public override void Attack(Entity entity)
+        {
+            base.Attack(entity);
 
+            if (CurrentAmulet is IAttackAmulet attackAmulet)
+            {
+                switch (attackAmulet.AmuletEffectTarget)
+                {
+                    case IAttackAmulet.EffectTarget.Character:
+                        attackAmulet.AmuletAction(this);
+                        break;
+                    case IAttackAmulet.EffectTarget.Enemy:
+                        attackAmulet.AmuletAction(entity);
+                        break;
+                    default:
+                        Console.WriteLine("Unknown target");
+                        break;
+                }
+            }
+        }
         override protected void Die()
         {
             base.Die();
@@ -85,6 +108,25 @@
             Console.ResetColor();
             return true;
         }
+        public bool EquipAmulet(Amulet newAmulet)
+        {
+            if (CurrentAmulet != null && CurrentAmulet.GetType() == newAmulet.GetType())
+            {
+                Console.ForegroundColor = ConsoleColor.DarkRed;
+                Console.WriteLine($"{newAmulet.Name} already equiped!");
+                Console.ResetColor();
+                return false;
+            }
+
+            if (CurrentAmulet is IPassiveAmulet passiveAmulet) passiveAmulet.UnequipEffect(this);
+
+            CurrentAmulet = newAmulet;
+
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine($"{this.Name} equiped {newAmulet.Name}");
+            Console.ResetColor();
+            return true;
+        }
         virtual public void ShowEquipedItems()
         {
             Console.ForegroundColor = ConsoleColor.Magenta;
@@ -92,7 +134,7 @@
             Console.Write(
                 $"Weapon: {this.CurrentWeapon.Name}\n" +
                 $"Armor: {(CurrentArmor != null ? this.CurrentArmor.Name : "None")}\n" +
-                $"Amulet: {/*this.EquipedAmulet.Name*/false}\n");
+                $"Amulet: {(CurrentAmulet != null ? this.CurrentAmulet.Name : "None")}\n");
             Console.ResetColor();
         }
     }

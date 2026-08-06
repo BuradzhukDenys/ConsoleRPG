@@ -57,6 +57,7 @@ namespace ConsoleRPG
         {
             Console.ForegroundColor = ConsoleColor.DarkMagenta;
             Console.WriteLine($"{this.Name}:");
+            this.ShowInfo();
 
             Console.ForegroundColor = ConsoleColor.Cyan;
             if (this is IUsable)

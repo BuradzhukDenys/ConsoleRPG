@@ -67,7 +67,11 @@
                 _damage = value;
             }
         }
-
+        public double DamageMultiplier { get; private set; } = 1.0f;
+        public int TotalDamage
+        {
+            get { return (int)Math.Ceiling(Damage * DamageMultiplier); }
+        }
         /// <summary>
         /// In fraction percent
         /// </summary>
@@ -79,11 +83,22 @@
                 _damageReduction = Math.Clamp(value, 0, 0.5);
             }
         }
+        public void AddDamageMultiplier(double multiplier)
+        {
+            if (multiplier < 0) throw new ArgumentException("Multiplier must be positive");
+            DamageMultiplier += multiplier;
+        }
+        public void RemoveDamageMultiplier(double multiplier)
+        {
+            DamageMultiplier -= Math.Abs(multiplier);
+
+            DamageMultiplier = Math.Max(1.0, DamageMultiplier);
+        }
         virtual public void Attack(Entity entity)
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine($"{this.Name} was attack {entity.Name} by {this.Damage} damage");
-            entity.TakeDamage(Damage);
+            entity.TakeDamage(this.TotalDamage);
             Console.ResetColor();
         }
         virtual public void Attack(Entity entity, int damage)
@@ -148,7 +163,7 @@
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"Health: {this.Health}/{this.MaxHealth}");
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"Damage: {this.Damage}");
+            Console.WriteLine($"Damage: {this.TotalDamage}");
             Console.ForegroundColor = ConsoleColor.DarkGray;
             Console.WriteLine($"Damage reduction: {this.DamageReduction * 100}%");
             Console.ResetColor();

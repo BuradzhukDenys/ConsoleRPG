@@ -9,22 +9,18 @@ namespace ConsoleRPG
     internal class Archer : Character, IHasAmmo
     {
         public IRangedWeapon? ArcherWeapon => CurrentWeapon as IRangedWeapon;
-        public Ammo? CurrentAmmo
-        {
-            get;
-            private set;
-        }
+        public Ammo? CurrentAmmo { get; private set; }
         public Archer(string name, int health) : base(name, health, new WoodenBow())
         {
-            CurrentAmmo = new Arrow(1);
-            Damage = (int)Math.Ceiling((double)CurrentWeapon.Damage * CurrentAmmo.DamageMultiplier);
+            CurrentAmmo = new Arrow(15);
+            AddDamageMultiplier(CurrentAmmo.DamageMultiplier);
             Inventory.AddItem(CurrentAmmo);
         }
         public Archer(string name, int health, int maxHealth, Weapon startWeapon, Armor startArmor, Amulet startAmulet, Ammo EquipedAmmo)
             : base(name, health, maxHealth, startWeapon, startArmor, startAmulet)
         {
             CurrentAmmo = EquipedAmmo;
-            Damage = (int)Math.Ceiling((double)CurrentWeapon.Damage * CurrentAmmo.DamageMultiplier);
+            AddDamageMultiplier(CurrentAmmo.DamageMultiplier);
         }
         public bool EquipAmmo(Ammo newAmmo)
         {
@@ -36,8 +32,10 @@ namespace ConsoleRPG
                 return false;
             }
 
+            RemoveDamageMultiplier(CurrentAmmo!.DamageMultiplier);
             CurrentAmmo = newAmmo;
-            Damage = (int)Math.Ceiling((double)CurrentWeapon.Damage * CurrentAmmo.DamageMultiplier);
+
+            AddDamageMultiplier(CurrentAmmo.DamageMultiplier);
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine($"{this.Name} equiped {newAmmo.Name}, and have {this.Damage} damage");
             Console.ResetColor();
@@ -53,28 +51,30 @@ namespace ConsoleRPG
                 return;
             }
 
-            if (CurrentAmmo != null)
+            if (CurrentAmmo == null || CurrentAmmo.Count <= 0)
             {
-                if (CurrentAmmo.Count > 0)
-                {
-                    CurrentAmmo.Count--;
-                    base.Attack(entity);
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine($"You consume 1 {CurrentAmmo.Name}");
-                }
-
-                if (CurrentAmmo.Count <= 0)
-                {
-                    CurrentAmmo = null;
-                    Console.WriteLine("You are out of ammo!");
-                    Attack(entity, ArcherWeapon!.MeleeDamage);
-                }
-            }
-            else
-            {
-                Attack(entity, ArcherWeapon!.MeleeDamage);
+                base.Attack(entity, ArcherWeapon!.MeleeDamage);
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine($"You attack {entity.Name} by melee attack");
+                Console.ResetColor();
+                return;
+                if (CurrentAmmo.Count > 0)
+                {
+                    
+                }
+            }
+
+            CurrentAmmo.Count--;
+            base.Attack(entity);
+
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine($"You consumed 1 {CurrentAmmo.Name}");
+
+            if (CurrentAmmo.Count <= 0)
+            {
+                RemoveDamageMultiplier(CurrentAmmo.DamageMultiplier);
+                CurrentAmmo = null;
+                Console.WriteLine("You are out of ammo!");
             }
             Console.ResetColor();
         }

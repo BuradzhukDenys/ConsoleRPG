@@ -245,7 +245,10 @@ namespace ConsoleRPG
                 $"23. Add healing potion\n" +
                 $"25. Add new bow\n" +
                 $"24. Add arrow(X10)\n" +
-                $"26. Add god arrow(X10)\n"
+                $"26. Add god arrow(X10)\n" +
+                $"27. Add fire amulet\n" +
+                $"28. Add stick\n" +
+                $"29. Add amulet of damage\n"
                 );
 
             playerInput = Console.ReadLine();
@@ -282,6 +285,15 @@ namespace ConsoleRPG
                     break;
                 case "26":
                     character?.Inventory.AddItem(new GodArrow(10));
+                    break;
+                case "27":
+                    character?.Inventory.AddItem(new FireAmulet());
+                    break;
+                case "28":
+                    character?.Inventory.AddItem(new Stick());
+                    break;
+                case "29":
+                    character?.Inventory.AddItem(new DamageAmulet());
                     break;
                 default:
                     var item = character?.Inventory.SelectItem(playerInput!);
