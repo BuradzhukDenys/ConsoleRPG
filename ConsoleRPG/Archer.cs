@@ -58,10 +58,6 @@ namespace ConsoleRPG
                 Console.WriteLine($"You attack {entity.Name} by melee attack");
                 Console.ResetColor();
                 return;
-                if (CurrentAmmo.Count > 0)
-                {
-                    
-                }
             }
 
             CurrentAmmo.Count--;
