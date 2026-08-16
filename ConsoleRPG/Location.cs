@@ -2,6 +2,7 @@
 {
     internal abstract class Location(int width, List<int> mapArea)
     {
+        public event Action<Enemy>? StartBattle;
         public enum Direction
         {
             UP,
@@ -9,23 +10,27 @@
             DOWN,
             LEFT
         }
-        private readonly List<int> _area = mapArea!;
+        private readonly List<int> _area = mapArea;
         private readonly int _mapWidth = width;
-        private void ShowMap()
+        protected Dictionary<Vector2, Enemy> _enemiesInfo = [];
+        public void ShowMap()
         {
             for (int i = 0; i < _area.Count; i++)
             {
-                if (_area[i] == 2)
+                switch (_area[i])
                 {
-                    Console.Write("[X]");
-                }
-                else if (_area[i] == 1)
-                {
-                    Console.Write("[ ]");
-                }
-                else if (_area[i] == 0)
-                {
-                    Console.Write("   ");
+                    case 0:
+                        Console.Write("   ");
+                        break;
+                    case 1:
+                        Console.Write("[ ]");
+                        break;
+                    case 2:
+                        Console.Write("[E]");
+                        break;
+                    case 9:
+                        Console.Write("[P]");
+                        break;
                 }
 
                 if ((i + 1) % _mapWidth == 0)
@@ -34,9 +39,9 @@
                 }
             }
         }
-        private void Move(Direction dir)
+        public void Move(Direction dir)
         {
-            int playerIndex = _area.IndexOf(2);
+            int playerIndex = _area.IndexOf(9);
 
             int playerX = playerIndex % _mapWidth;
             int playerY = playerIndex / _mapWidth;
@@ -60,47 +65,40 @@
             }
 
             int nextStepIndex = nextY * _mapWidth + nextX;
+            int nextStepValue = _area[nextStepIndex];
 
-            if (_area[nextStepIndex] == 0)
+            if (nextStepValue == 0)
             {
                 return;
             }
 
-            _area[playerIndex] = 1;
-            _area[nextStepIndex] = 2;
-        }
-        public void Start()
-        {
-            while (true)
+            if (nextStepValue == 2)
             {
-                Console.Clear();
-                ShowMap();
-                Console.Write(
-                    "1. UP\n" +
-                    "2. DOWN\n" +
-                    "3. RIGHT\n" +
-                    "4. LEFT\n");
+                var enemyPos = new Vector2(nextX, nextY);
 
-                string input = Console.ReadLine()!;
-
-                switch (input)
+                if (_enemiesInfo.TryGetValue(enemyPos, out Enemy? enemy) && enemy != null)
                 {
-                    case "1":
-                        Move(Direction.UP);
-                        break;
-                    case "2":
-                        Move(Direction.DOWN);
-                        break;
-                    case "3":
-                        Move(Direction.RIGHT);
-                        break;
-                    case "4":
-                        Move(Direction.LEFT);
-                        break;
-                    default:
-                        Console.WriteLine("Unknown action");
-                        break;
+                    StartBattle?.Invoke(enemy);
                 }
+                return;
+            }
+
+            _area[playerIndex] = 1;
+            _area[nextStepIndex] = 9;
+        }
+        //When enemy is defeated, find this enemy in Dictionary and delete enemy from dictionary and remove in map to empty cell
+        public void RemoveDefeatedEnemy(Enemy deadEnemy)
+        {
+            var enemyEntry = _enemiesInfo.FirstOrDefault(kV => kV.Value == deadEnemy);
+
+            if (enemyEntry.Value != null)
+            {
+                Vector2 pos = enemyEntry.Key;
+
+                _enemiesInfo.Remove(pos);
+
+                int mapIndex = pos.Y * _mapWidth + pos.X;
+                _area[mapIndex] = 1;
             }
         }
     }

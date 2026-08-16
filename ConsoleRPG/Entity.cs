@@ -174,9 +174,10 @@
 
             newEffect.InitializeMessage(this);
         }
+        //Walk through effects list copy, if effect will add new effect program don't crash
         public void ApplyEffects()
         {
-            foreach (var effect in effects)
+            foreach (var effect in effects.ToList())
             {
                 effect.Apply(this);
             }

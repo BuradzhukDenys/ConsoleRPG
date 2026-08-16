@@ -1,4 +1,4 @@
-﻿using static System.Net.Mime.MediaTypeNames;
+﻿using static ConsoleRPG.Location;
 
 namespace ConsoleRPG
 {
@@ -10,6 +10,7 @@ namespace ConsoleRPG
             Battle,
             Inventory,
             ItemAction,
+            Map,
             Waiting
         }
         enum BattleState
@@ -17,7 +18,10 @@ namespace ConsoleRPG
             PlayerTurn,
             EnemyTurn
         }
-        private Game() { }
+        private Game()
+        {
+            _location.StartBattle += InitiateBattle;
+        }
         private static Game? _instance;
         public static Game? Instance
         {
@@ -38,9 +42,9 @@ namespace ConsoleRPG
             "3. Wizzard"
             ];
 
-        private Character? character = null;
-        private Location location = new Forest();
-        private Enemy? enemy = null;
+        private Character? _character = null;
+        private Location _location = new Forest();
+        private Enemy? _currentEnemy = null;
         private string? playerInput;
 
         private GameState currentGameState = GameState.SelectCharacterClass;
@@ -62,10 +66,10 @@ namespace ConsoleRPG
             switch (playerInput)
             {
                 case "1":
-                    character = new Warrior("Warrior", 120);
+                    _character = new Warrior("Warrior", 120);
                     break;
                 case "2":
-                    character = new Archer("Archer", 100);
+                    _character = new Archer("Archer", 100);
                     break;
                 case "3":
                     //character = new Wizzard("Wizzard", 60, 35);
@@ -78,32 +82,23 @@ namespace ConsoleRPG
                     break;
             }
 
-            if (character != null)
+            if (_character != null)
             {
-                character.OnCharacterDeath += GameOver;
+                _character.OnCharacterDeath += GameOver;
                 Console.Clear();
                 currentGameState = GameState.Waiting; // Test
-                //currentGameState = GameState.Battle;
             }
             Console.ResetColor();
         }
         private void Battle()
         {
-            currentBattleState = BattleState.PlayerTurn;
-            character?.ApplyEffects();
-
-            if (enemy == null)
-            {
-                enemy = new Slime("Slime", 60, 10, 10);
-            }
-
             Console.ResetColor();
             Console.WriteLine("------------------------------------------------------------");
-            character!.ShowBattleInfo();
+            _character!.ShowBattleInfo();
             CharacterData.ShowGold();
             Console.ResetColor();
             Console.WriteLine("------------------------------------------------------------");
-            enemy!.ShowBattleInfo();
+            _currentEnemy!.ShowBattleInfo();
             Console.ResetColor();
             Console.WriteLine("------------------------------------------------------------");
             Console.ForegroundColor = ConsoleColor.Cyan;
@@ -121,14 +116,14 @@ namespace ConsoleRPG
             switch (playerInput)
             {
                 case "1":
-                    character.Attack(enemy);
+                    _character.Attack(_currentEnemy);
                     currentBattleState = BattleState.EnemyTurn;
                     break;
                 case "2":
                     currentGameState = GameState.Inventory;
                     break;
                 case "3":
-                    enemy?.AddEffect(new BurnEffect(5));
+                    _currentEnemy?.AddEffect(new BurnEffect(5));
                     break;
                 case "4":
                     currentBattleState = BattleState.EnemyTurn;
@@ -140,21 +135,35 @@ namespace ConsoleRPG
                     break;
             }
 
-            if (enemy != null && currentBattleState == BattleState.EnemyTurn)
+            if (_currentEnemy != null && currentBattleState == BattleState.EnemyTurn)
             {
-                enemy.ApplyEffects();
-                if (enemy.IsDead)
+                _currentEnemy.ApplyEffects();
+                if (_currentEnemy.IsDead)
                 {
-                    enemy = null;
+                    _location.RemoveDefeatedEnemy(_currentEnemy);
+
+                    _currentEnemy = null;
+                    currentGameState = GameState.Map;
                 }
                 else
                 {
-                    enemy.Attack(character!);
+                    _currentEnemy.Attack(_character!);
+
+                    _character?.ApplyEffects();
+                    currentBattleState = BattleState.PlayerTurn;
                 }
             }
             Console.ResetColor();
         }
+        private void InitiateBattle(Enemy enemy)
+        {
+            Console.Clear();
+            _currentEnemy = enemy;
+            currentGameState = GameState.Battle;
+            currentBattleState = BattleState.PlayerTurn;
 
+            _character?.ApplyEffects();
+        }
         private void SelectTestField()
         {
             Console.ForegroundColor = ConsoleColor.Cyan;
@@ -177,7 +186,7 @@ namespace ConsoleRPG
                     currentGameState = GameState.Inventory;
                     break;
                 case "3":
-                    location.Start();
+                    currentGameState = GameState.Map;
                     break;
                 default:
                     Console.ForegroundColor = ConsoleColor.DarkRed;
@@ -188,14 +197,41 @@ namespace ConsoleRPG
             Console.Clear();
             Console.ResetColor();
         }
+        private void MapExplore()
+        {
+            Console.Clear();
+            _location.ShowMap();
+            Console.Write(
+                "1. UP\n" +
+                "2. DOWN\n" +
+                "3. RIGHT\n" +
+                "4. LEFT\n");
 
+            string input = Console.ReadLine()!;
+
+            switch (input)
+            {
+                case "1":
+                    _location.Move(Direction.UP);
+                    break;
+                case "2":
+                    _location.Move(Direction.DOWN);
+                    break;
+                case "3":
+                    _location.Move(Direction.RIGHT);
+                    break;
+                case "4":
+                    _location.Move(Direction.LEFT);
+                    break;
+                default:
+                    Console.WriteLine("Unknown action");
+                    break;
+            }
+        }
         private void ItemActions()
         {
-            var item = character?.Inventory.SelectItem(playerInput!);
-            if (item != null)
-            {
-                item.ShowActions();
-            }
+            var item = _character?.Inventory.SelectItem(playerInput!);
+            item?.ShowActions();
 
             playerInput = Console.ReadLine();
 
@@ -203,10 +239,9 @@ namespace ConsoleRPG
             switch (playerInput)
             {
                 case "1":
-                    if (item != null && item.Action(character!))
+                    if (item != null && item.Action(_character!))
                     {
                         currentGameState = previousInventoryState;
-                        currentBattleState = BattleState.EnemyTurn;
                     }
                     else
                     {
@@ -228,9 +263,9 @@ namespace ConsoleRPG
         {
             Console.ResetColor();
             Console.WriteLine("------------------------------------------------------------");
-            character?.ShowEquipedItems();
+            _character?.ShowEquipedItems();
             Console.WriteLine("------------------------------------------------------------");
-            character?.Inventory.ShowInventory();
+            _character?.Inventory.ShowInventory();
             Console.ResetColor();
             Console.WriteLine("------------------------------------------------------------");
 
@@ -257,46 +292,46 @@ namespace ConsoleRPG
             switch (playerInput)
             {
                 case "8":
-                    character?.Inventory.PreviousPage();
+                    _character?.Inventory.PreviousPage();
                     break;
                 case "9":
-                    character?.Inventory.NextPage();
+                    _character?.Inventory.NextPage();
                     break;
                 case "0":
                     currentGameState = previousInventoryState;
                     break;
                 case "20":
-                    character?.Inventory.AddItem(new LeatherArmor());
+                    _character?.Inventory.AddItem(new LeatherArmor());
                     break;
                 case "21":
-                    character?.Inventory.AddItem(new GodArmor());
+                    _character?.Inventory.AddItem(new GodArmor());
                     break;
                 case "22":
-                    character?.Inventory.AddItem(new UltraHammer());
+                    _character?.Inventory.AddItem(new UltraHammer());
                     break;
                 case "23":
-                    character?.Inventory.AddItem(new HealingPotion(1));
+                    _character?.Inventory.AddItem(new HealingPotion(1));
                     break;
                 case "24":
-                    character?.Inventory.AddItem(new Arrow(10));
+                    _character?.Inventory.AddItem(new Arrow(10));
                     break;
                 case "25":
-                    character?.Inventory.AddItem(new GodBow());
+                    _character?.Inventory.AddItem(new GodBow());
                     break;
                 case "26":
-                    character?.Inventory.AddItem(new GodArrow(10));
+                    _character?.Inventory.AddItem(new GodArrow(10));
                     break;
                 case "27":
-                    character?.Inventory.AddItem(new FireAmulet());
+                    _character?.Inventory.AddItem(new FireAmulet());
                     break;
                 case "28":
-                    character?.Inventory.AddItem(new Stick());
+                    _character?.Inventory.AddItem(new Stick());
                     break;
                 case "29":
-                    character?.Inventory.AddItem(new DamageAmulet());
+                    _character?.Inventory.AddItem(new DamageAmulet());
                     break;
                 default:
-                    var item = character?.Inventory.SelectItem(playerInput!);
+                    var item = _character?.Inventory.SelectItem(playerInput!);
                     if (item != null)
                     {
                         currentGameState = GameState.ItemAction;
@@ -327,6 +362,9 @@ namespace ConsoleRPG
                     case GameState.ItemAction:
                         ItemActions();
                         break;
+                    case GameState.Map:
+                        MapExplore();
+                        break;
                     default:
                         Console.ForegroundColor = ConsoleColor.DarkRed;
                         Console.WriteLine("Unknown game state");
@@ -339,6 +377,12 @@ namespace ConsoleRPG
 
         private void GameOver()
         {
+            if (_character != null)
+            {
+                _character.OnCharacterDeath -= GameOver;
+                _character = null;
+            }
+
             Console.ForegroundColor = ConsoleColor.DarkRed;
             Console.WriteLine("Game Over!");
             Console.ResetColor();
