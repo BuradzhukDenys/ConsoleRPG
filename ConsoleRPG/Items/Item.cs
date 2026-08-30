@@ -1,0 +1,99 @@
+﻿using ConsoleRPG.Entities.Characters;
+using ConsoleRPG.Items.Consumables;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ConsoleRPG.Items;
+
+internal abstract class Item
+{
+    private int _count;
+    private int _maxCount;
+    private string? _name;
+
+    public string? Name
+    {
+        get { return _name; }
+        private set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                throw new ArgumentException("Item name can't be empty or null!");
+            }
+
+            _name = value;
+        }
+    }
+    public int Count
+    {
+        get { return _count; }
+        set
+        {
+            _count = Math.Clamp(value, 0, MaxCount);
+        }
+    }
+
+    public int MaxCount
+    {
+        get { return _maxCount; }
+        private set
+        {
+            CanStack = value > 1;
+
+            _maxCount = Math.Clamp(value, 1, 99);
+        }
+    }
+    public bool CanStack { get; private set; } = false;
+
+    public Item(string name, int maxCount, int count)
+    {
+        Name = name;
+        MaxCount = maxCount;
+        Count = count;
+    }
+    public Item Clone()
+    {
+        return (Item)this.MemberwiseClone();
+    }
+    public abstract void ShowInfo();
+    public void ShowActions()
+    {
+        Console.ForegroundColor = ConsoleColor.DarkMagenta;
+        Console.WriteLine($"{Name}:");
+        ShowInfo();
+
+        Console.ForegroundColor = ConsoleColor.Cyan;
+        if (this is IUsable)
+        {
+            Console.Write(
+                $"1. Use\n" +
+                $"0. Back\n"
+                );
+        }
+        else if (this is IEquipable)
+        {
+            Console.Write(
+                $"1. Equip\n" +
+                $"0. Back\n"
+                );
+        }
+        Console.ResetColor();
+    }
+
+    public bool Action(Character character)
+    {
+        if (this is IUsable usableItem)
+        {
+            return usableItem.Use(character);
+        }
+        else if (this is IEquipable equipableItem)
+        {
+            return equipableItem.Equip(character);
+        }
+
+        return false;
+    }
+}

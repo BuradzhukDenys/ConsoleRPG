@@ -1,0 +1,15 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ConsoleRPG.Items.Weapons.MeleeWeapons;
+
+internal class IronSword : Weapon
+{
+    public IronSword() : base("Iron sword")
+    {
+        Damage = 30;
+    }
+}

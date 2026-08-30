@@ -1,0 +1,35 @@
+﻿namespace ConsoleRPG.Entities.Enemies;
+
+internal abstract class Enemy : Entity
+{
+    public int GoldReward { get; protected set; }
+
+    public Enemy(string name, int health, int damage, int goldReward)
+    {
+        Name = name;
+        Damage = damage;
+
+        if (goldReward < 0)
+        {
+            throw new ArgumentOutOfRangeException("Gold reward can't be negative");
+        }
+        GoldReward = goldReward;
+
+        MaxHealth = health;
+        Health = health;
+    }
+
+    private void GiveReward()
+    {
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.WriteLine($"{Name} give {GoldReward} gold");
+        CharacterData.AddGold(GoldReward);
+        Console.ResetColor();
+    }
+
+    override protected void Die()
+    {
+        base.Die();
+        GiveReward();
+    }
+}
