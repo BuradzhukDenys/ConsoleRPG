@@ -8,7 +8,7 @@ namespace ConsoleRPG.Items.Ammos;
 
 internal class GodArrow : Ammo
 {
-    public GodArrow(int count) : base("God arrow", count)
+    public GodArrow() : base("God arrow")
     {
         DamageMultiplier = 3;
     }

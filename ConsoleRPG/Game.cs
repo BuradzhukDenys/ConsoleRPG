@@ -11,6 +11,7 @@ using ConsoleRPG.Effects;
 using ConsoleRPG.Locations.Forest;
 using ConsoleRPG.Locations;
 using static ConsoleRPG.Locations.Location;
+using ConsoleRPG.Items.Weapons;
 
 namespace ConsoleRPG;
 
@@ -32,16 +33,19 @@ internal sealed class Game
         PlayerTurn,
         EnemyTurn
     }
-    private Game() { }
+    private Game()
+    {
+        UniversalFactory<Enemy>.Initialize();
+        UniversalFactory<Item>.Initialize();
+        UniversalFactory<Location>.Initialize();
+        UniversalFactory<Character>.Initialize();
+    }
     private static Game? _instance;
     public static Game? Instance
     {
         get
         {
-            if (_instance == null)
-            {
-                _instance = new Game();
-            }
+            _instance ??= new Game();
 
             return _instance;
         }
@@ -53,7 +57,7 @@ internal sealed class Game
         "3. Wizzard"
         ];
 
-    private GameSaveData _saveData;
+    private GameSaveData? _saveData = null;
     private Character? _character = null;
     private Location? _location = null;
     private Enemy? _currentEnemy = null;
@@ -82,11 +86,11 @@ internal sealed class Game
         {
             case "1":
                 _character = new Warrior();
-                CharacterData.setCharacterClass(CharacterData.CharacterClass.Warrior);
+                CharacterData.SetCharacterClass(CharacterData.CharacterClass.Warrior);
                 break;
             case "2":
                 _character = new Archer();
-                CharacterData.setCharacterClass(CharacterData.CharacterClass.Archer);
+                CharacterData.SetCharacterClass(CharacterData.CharacterClass.Archer);
                 break;
             case "3":
                 //character = new Wizzard("Wizzard", 60, 35);
@@ -134,7 +138,7 @@ internal sealed class Game
     }
     private void Battle()
     {
-        if (_currentEnemy == null)
+        if (_currentEnemy == null || _character == null)
         {
             currentGameState = previousGameState;
             return;
@@ -144,10 +148,10 @@ internal sealed class Game
 
         Console.ResetColor();
         Console.WriteLine("------------------------------------------------------------");
-        _character!.ShowBattleInfo();
+        _character.ShowBattleInfo();
         Console.ResetColor();
         Console.WriteLine("------------------------------------------------------------");
-        _currentEnemy!.ShowBattleInfo();
+        _currentEnemy.ShowBattleInfo();
         Console.ResetColor();
         Console.WriteLine("------------------------------------------------------------");
         Console.ForegroundColor = ConsoleColor.Cyan;
@@ -196,9 +200,9 @@ internal sealed class Game
             }
             else
             {
-                _currentEnemy.Attack(_character!);
+                _currentEnemy.Attack(_character);
 
-                _character?.ApplyEffects();
+                _character.ApplyEffects();
                 currentBattleState = BattleState.PlayerTurn;
             }
         }
@@ -263,12 +267,12 @@ internal sealed class Game
             "9. Load game\n" +
             "0. Save game\n");
 
-        string input = Console.ReadLine()!;
+        playerInput = Console.ReadLine()!;
 
         previousGameState = GameState.Map;
         Console.Clear();
 
-        switch (input)
+        switch (playerInput)
         {
             case "1":
                 _location?.Move(Direction.UP);
@@ -301,16 +305,158 @@ internal sealed class Game
     }
     private void SaveGame()
     {
+        if (_character == null || _location == null) return;
+
+        List<ItemSaveData> savedInventory = [];
+        List<OfferSaveData> offerSaveData = [];
+
+        foreach (var item in _character.Inventory.Items)
+        {
+            savedInventory.Add(new ItemSaveData { Count = item.Count, Type = item.GetType().Name });
+        }
+
+        foreach (var offer in _currentShop?.Items ?? [])
+        {
+            ItemSaveData OfferItem = new() { Count = offer.Item.Count, Type = offer.Item.GetType().Name };
+
+            offerSaveData.Add(new OfferSaveData() { AvailableCount = offer.Count, Cost = offer.Cost, Item = OfferItem });
+        }
+
+        var locationData = new LocationSaveData()
+        {
+            LocationType = _location.GetType().Name,
+            Area = _location.Area,
+            Enemies = _location.GetEnemiesForSave(),
+            ShopOffers = offerSaveData
+        };
+
+        _saveData = new GameSaveData()
+        {
+            CurrentHealth = _character.Health,
+            MaxHealth = _character.MaxHealth,
+            CurrentWeaponType = _character.CurrentWeapon.GetType().Name,
+            CurrentArmorType = _character?.CurrentArmor?.GetType().Name ?? "",
+            CurrentAmuletType = _character?.CurrentAmulet?.GetType().Name ?? "",
+            CurrentAmmoType = (_character as Archer)?.CurrentAmmo?.GetType().Name ?? "",
+            CharacterClass = CharacterData.CurrentCharacterClass,
+            Gold = CharacterData.Gold,
+
+            Inventory = savedInventory,
+            Location = locationData
+        };
+
         SaveManager.SaveData(_saveData);
     }
     private void LoadSave()
     {
         _saveData = SaveManager.LoadData();
 
-        _character = _saveData.Character;
-        CharacterData.setCharacterClass(_saveData.CharacterClass);
-        CharacterData.setGold(_saveData.Gold);
-        _location = _saveData.Location;
+        if (_saveData == null) return;
+
+        CharacterData.SetCharacterClass(_saveData.CharacterClass);
+        CharacterData.SetGold(_saveData.Gold);
+
+        LoadCharacter();
+        LoadLocation();
+    }
+    private void LoadCharacter()
+    {
+        if (_saveData == null) return;
+
+        _character = UniversalFactory<Character>.CreateObject(_saveData.CharacterClass.ToString());
+
+        if (_character == null) return;
+
+        _character.Health = _saveData.CurrentHealth;
+        _character.MaxHealth = _saveData.MaxHealth;
+
+        if (UniversalFactory<Item>.CreateObject(_saveData.CurrentWeaponType) is Weapon w)
+        {
+            _character.CurrentWeapon = w;
+        }
+        var startArmor = (Armor?)UniversalFactory<Item>.CreateObject(_saveData.CurrentArmorType);
+        var startAmulet = (Amulet?)UniversalFactory<Item>.CreateObject(_saveData.CurrentAmuletType);
+
+        _character.CurrentArmor = startArmor;
+        _character.CurrentAmulet = startAmulet;
+        
+        if (_character is Archer archer)
+        {
+            var startAmmo = (Ammo?)UniversalFactory<Item>.CreateObject(_saveData.CurrentAmmoType);
+            var savedAmmo = _saveData.Inventory.FirstOrDefault(it => it.Type == startAmmo?.GetType().Name);
+
+            if (startAmmo != null && savedAmmo != null)
+            {
+                startAmmo.Count = savedAmmo.Count;
+                archer.CurrentAmmo = startAmmo;
+            }
+        }
+
+        _character.Inventory.Items.Clear();
+
+        foreach (var itemSaveData in _saveData.Inventory)
+        {
+            Item? newItem = UniversalFactory<Item>.CreateObject(itemSaveData.Type);
+
+            if (newItem != null)
+            {
+                if (newItem.CanStack)
+                {
+                    newItem.Count = itemSaveData.Count;
+                }
+                _character.Inventory.Items.Add(newItem);
+            }
+        }
+    }
+    private void LoadLocation()
+    {
+        if (_saveData == null) return;
+
+        var newLocation = UniversalFactory<Location>.CreateObject(_saveData?.Location?.LocationType!)!;
+
+        if (newLocation == null) return;
+
+        newLocation.Area = _saveData?.Location?.Area ?? [];
+        newLocation.EnemiesInfo.Clear();
+
+        foreach (var kv in _saveData?.Location?.Enemies ?? [])
+        {
+            int enemyX = kv.Key % newLocation.MapWidth;
+            int enemyY = kv.Key / newLocation.MapWidth;
+
+            var enemyPos = new Vector2(enemyX, enemyY);
+
+            Enemy? newEnemy = UniversalFactory<Enemy>.CreateObject(kv.Value);
+
+            if (newEnemy != null)
+            {
+                newLocation.EnemiesInfo.Add(enemyPos, newEnemy);
+            }
+        }
+
+        newLocation.Shop.Items.Clear();
+        foreach (var offerData in _saveData?.Location?.ShopOffers ?? [])
+        {
+            if (offerData.Item == null) continue;
+
+            var restoredItem = UniversalFactory<Item>.CreateObject(offerData.Item?.Type!);
+
+            if (restoredItem != null)
+            {
+                restoredItem.Count = offerData.Item!.Count;
+
+                Offer newOffer = new()
+                {
+                    Item = restoredItem,
+                    Cost = offerData.Cost,
+                    Count = offerData.AvailableCount
+                };
+
+                newLocation.Shop.Items.Add(newOffer);
+            }
+        }
+
+        SetupLocation(newLocation);
     }
     private void Shop()
     {
@@ -367,7 +513,7 @@ internal sealed class Game
         var item = _character?.Inventory.SelectItem(playerInput!);
         item?.ShowActions();
 
-        playerInput = Console.ReadLine();
+        playerInput = Console.ReadLine()!;
 
         Console.Clear();
         switch (playerInput)
@@ -422,7 +568,7 @@ internal sealed class Game
             $"29. Add amulet of damage\n"
             );
 
-        playerInput = Console.ReadLine();
+        playerInput = Console.ReadLine()!;
 
         Console.Clear();
         switch (playerInput)
@@ -446,16 +592,16 @@ internal sealed class Game
                 _character?.Inventory.AddItem(new UltraHammer());
                 break;
             case "23":
-                _character?.Inventory.AddItem(new HealingPotion(1));
+                _character?.Inventory.AddItem(new HealingPotion());
                 break;
             case "24":
-                _character?.Inventory.AddItem(new Arrow(10));
+                _character?.Inventory.AddItem(new Arrow { Count = 10 });
                 break;
             case "25":
                 _character?.Inventory.AddItem(new GodBow());
                 break;
             case "26":
-                _character?.Inventory.AddItem(new GodArrow(10));
+                _character?.Inventory.AddItem(new GodArrow { Count = 10 });
                 break;
             case "27":
                 _character?.Inventory.AddItem(new FireAmulet());
@@ -467,7 +613,7 @@ internal sealed class Game
                 _character?.Inventory.AddItem(new DamageAmulet());
                 break;
             default:
-                var item = _character?.Inventory.SelectItem(playerInput!);
+                var item = _character?.Inventory.SelectItem(playerInput);
                 if (item != null)
                 {
                     currentGameState = GameState.ItemAction;

@@ -8,7 +8,7 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace ConsoleRPG.Items.Ammos;
 
-internal abstract class Ammo(string name, int count) : Item(name, 99, count), IEquipable
+internal abstract class Ammo(string name, int count = 1) : Item(name, 99, count), IEquipable
 {
     private double _damageMultiplier;
     public double DamageMultiplier

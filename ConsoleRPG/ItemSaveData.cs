@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace ConsoleRPG
 {
-    internal class CharacterFactory
+    internal class ItemSaveData
     {
+        public int Count { get; set; }
+        public string Type { get; set; } = "";
     }
 }

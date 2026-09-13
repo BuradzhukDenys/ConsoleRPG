@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace ConsoleRPG.Items.Consumables;
 
-internal class HealingPotion(int count) : Item("Healing potion", 5, count), IUsable
+internal class HealingPotion : Item, IUsable
 {
     public int HealAmount { get; private set; } = 30;
-
+    public HealingPotion() : base("Healing potion", 5) { }
     public bool Use(Character target)
     {
         if (!target.Heal(HealAmount))

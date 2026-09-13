@@ -9,13 +9,20 @@ namespace ConsoleRPG.Entities.Characters;
 
 internal class Inventory
 {
-    private List<Item> inventory = [];
+    public List<Item> Items { get; private set; } = [];
 
     private Paginator<Item> _paginator = new(7);
-
+    public Inventory()
+    {
+        Items = [];
+    }
+    public Inventory(List<Item> items)
+    {
+        Items = items;
+    }
     public void AddItem(Item item)
     {
-        var searchItem = inventory.FirstOrDefault(
+        var searchItem = Items.FirstOrDefault(
             i => i.GetType() == item.GetType() &&
             i.Count < i.MaxCount);
 
@@ -25,19 +32,19 @@ internal class Inventory
         }
         else
         {
-            inventory.Add(item);
+            Items.Add(item);
         }
     }
     private void CheckItemsExist()
     {
-        inventory.RemoveAll(item => item.Count <= 0);
+        Items.RemoveAll(item => item.Count <= 0);
     }
     public void ShowInventory()
     {
         CheckItemsExist();
 
-        int totalPages = _paginator.GetTotalPages(inventory.Count);
-        List<Item> itemsOnPage = _paginator.GetPage(inventory);
+        int totalPages = _paginator.GetTotalPages(Items.Count);
+        List<Item> itemsOnPage = _paginator.GetPage(Items);
 
         Console.ForegroundColor = ConsoleColor.Cyan;
         Console.WriteLine($"Inventory: (Page {_paginator.CurrentPage}/{totalPages}):");
@@ -67,16 +74,16 @@ internal class Inventory
         {
             int realIndex = (_paginator.CurrentPage - 1) * _paginator.ItemsPerPage + (slot - 1);
 
-            if (realIndex >= 0 && realIndex < inventory.Count)
+            if (realIndex >= 0 && realIndex < Items.Count)
             {
-                return inventory[realIndex];
+                return Items[realIndex];
             }
         }
         return null;
     }
     public void NextPage()
     {
-        _paginator.NextPage(inventory.Count);
+        _paginator.NextPage(Items.Count);
     }
     public void PreviousPage()
     {

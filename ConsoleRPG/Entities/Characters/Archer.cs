@@ -15,15 +15,15 @@ internal class Archer : Character, IHasAmmo
 {
     private const int _baseHealth = 100;
     public IRangedWeapon? ArcherWeapon => CurrentWeapon as IRangedWeapon;
-    public Ammo? CurrentAmmo { get; private set; }
+    public Ammo? CurrentAmmo { get; internal set; }
     public Archer() : base("Archer", _baseHealth, new WoodenBow())
     {
-        CurrentAmmo = new Arrow(15);
+        CurrentAmmo = new Arrow { Count = 15 };
         AddDamageMultiplier(CurrentAmmo.DamageMultiplier);
         Inventory.AddItem(CurrentAmmo);
     }
-    public Archer(int health, int maxHealth, Weapon startWeapon, Armor startArmor, Amulet startAmulet, Ammo EquipedAmmo)
-        : base("Archer", health, maxHealth, startWeapon, startArmor, startAmulet)
+    public Archer(int health, int maxHealth, Weapon startWeapon, Armor startArmor, Amulet startAmulet, Ammo EquipedAmmo, Inventory inventory)
+        : base("Archer", health, maxHealth, startWeapon, startArmor, startAmulet, inventory)
     {
         CurrentAmmo = EquipedAmmo;
         AddDamageMultiplier(CurrentAmmo.DamageMultiplier);
@@ -38,7 +38,10 @@ internal class Archer : Character, IHasAmmo
             return false;
         }
 
-        RemoveDamageMultiplier(CurrentAmmo!.DamageMultiplier);
+        if (CurrentAmmo != null)
+        {
+            RemoveDamageMultiplier(CurrentAmmo.DamageMultiplier);
+        }
         CurrentAmmo = newAmmo;
 
         AddDamageMultiplier(CurrentAmmo.DamageMultiplier);
@@ -49,7 +52,7 @@ internal class Archer : Character, IHasAmmo
     }
     public override void Attack(Entity entity)
     {
-        if (CurrentWeapon is not IRangedWeapon)
+        if (CurrentWeapon is not IRangedWeapon || ArcherWeapon == null)
         {
             Console.ForegroundColor = ConsoleColor.DarkRed;
             Console.WriteLine("You can't attack without ranged weapon!");
@@ -59,7 +62,7 @@ internal class Archer : Character, IHasAmmo
 
         if (CurrentAmmo == null || CurrentAmmo.Count <= 0)
         {
-            base.Attack(entity, ArcherWeapon!.MeleeDamage);
+            base.Attack(entity, ArcherWeapon.MeleeDamage);
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine($"You attack {entity.Name} by melee attack");
             Console.ResetColor();
@@ -82,7 +85,7 @@ internal class Archer : Character, IHasAmmo
     }
     public override bool EquipWeapon(Weapon newWeapon)
     {
-        if (newWeapon is IRangedWeapon rangedWeapon)
+        if (newWeapon is IRangedWeapon)
         {
             return base.EquipWeapon(newWeapon);
         }
@@ -94,7 +97,7 @@ internal class Archer : Character, IHasAmmo
         base.ShowEquipedItems();
 
         Console.ForegroundColor = ConsoleColor.Magenta;
-        Console.WriteLine($"Ammo: {(CurrentAmmo != null ? CurrentAmmo.Name : "None")}");
+        Console.WriteLine($"Ammo: {(CurrentAmmo?.Name ?? "None")}");
         Console.ResetColor();
     }
     public override void ShowBattleInfo()

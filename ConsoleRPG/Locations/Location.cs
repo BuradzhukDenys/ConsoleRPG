@@ -13,10 +13,10 @@ internal abstract class Location(int width, List<int> map, Shop shop)
         DOWN,
         LEFT
     }
-    protected List<int> Area { get; private set; } = map;
-    protected int MapWidth { get; private set; } = width;
-    protected Dictionary<Vector2, Enemy> _enemiesInfo = [];
-    public Shop Shop { get; private set; } = shop;
+    public List<int> Area { get; internal set; } = map;
+    public int MapWidth { get; private set; } = width;
+    public Dictionary<Vector2, Enemy> EnemiesInfo { get; internal set; } = [];
+    public Shop Shop { get; internal set; } = shop;
     public void ShowMap()
     {
         for (int i = 0; i < Area.Count; i++)
@@ -83,7 +83,7 @@ internal abstract class Location(int width, List<int> map, Shop shop)
         {
             var enemyPos = new Vector2(nextX, nextY);
 
-            if (_enemiesInfo.TryGetValue(enemyPos, out Enemy? enemy) && enemy != null)
+            if (EnemiesInfo.TryGetValue(enemyPos, out Enemy? enemy) && enemy != null)
             {
                 StartBattle?.Invoke(enemy);
             }
@@ -101,16 +101,20 @@ internal abstract class Location(int width, List<int> map, Shop shop)
     //When enemy is defeated, find this enemy in Dictionary and delete enemy from dictionary and remove in map to empty cell
     public void RemoveDefeatedEnemy(Enemy deadEnemy)
     {
-        var enemyEntry = _enemiesInfo.FirstOrDefault(kV => kV.Value == deadEnemy);
+        var enemyEntry = EnemiesInfo.FirstOrDefault(kV => kV.Value == deadEnemy);
 
         if (enemyEntry.Value != null)
         {
             Vector2 pos = enemyEntry.Key;
 
-            _enemiesInfo.Remove(pos);
+            EnemiesInfo.Remove(pos);
 
             int mapIndex = pos.Y * MapWidth + pos.X;
             Area[mapIndex] = 1;
         }
+    }
+    public Dictionary<int, string> GetEnemiesForSave()
+    {
+        return new Dictionary<int, string>(EnemiesInfo.Select(kv => new KeyValuePair<int, string>(kv.Key.Y * MapWidth + kv.Key.X, kv.Value.GetType().Name)));
     }
 }

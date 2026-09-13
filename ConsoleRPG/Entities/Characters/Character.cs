@@ -9,10 +9,10 @@ namespace ConsoleRPG.Entities.Characters;
 internal abstract class Character : Entity
 {
     public event Action? OnCharacterDeath;
-    public Inventory Inventory { get; private set; } = new();
-    public Weapon CurrentWeapon { get; private set; }
-    public Armor? CurrentArmor { get; private set; }
-    public Amulet? CurrentAmulet { get; private set; }
+    public Inventory Inventory { get; internal set; } = new();
+    public Weapon CurrentWeapon { get; internal set; }
+    public Armor? CurrentArmor { get; internal set; }
+    public Amulet? CurrentAmulet { get; internal set; }
     protected Character(string name, int health, Weapon startWeapon) //First save initialize constructor
     {
         Name = name;
@@ -20,10 +20,10 @@ internal abstract class Character : Entity
         Health = health;
         CurrentWeapon = startWeapon;
         Damage = CurrentWeapon.Damage;
-        Inventory.AddItem(CurrentWeapon!);
+        Inventory.AddItem(CurrentWeapon);
     }
 
-    protected Character(string name, int health, int maxHealth, Weapon startWeapon, Armor startArmor, Amulet startAmulet) //Constructor for load from file
+    protected Character(string name, int health, int maxHealth, Weapon startWeapon, Armor startArmor, Amulet startAmulet, Inventory inventory) //Constructor for load from file
     {
         Name = name;
         MaxHealth = maxHealth;
@@ -32,7 +32,17 @@ internal abstract class Character : Entity
         CurrentArmor = startArmor;
         CurrentAmulet = startAmulet;
         Damage = CurrentWeapon.Damage;
-        DamageReduction = CurrentArmor.DamageReduction;
+
+        if (startArmor != null)
+        {
+            DamageReduction = CurrentArmor.DamageReduction;
+        }
+
+        if (CurrentAmulet is IPassiveAmulet)
+        {
+            CurrentAmulet.Equip(this);
+        }
+        this.Inventory = inventory;
     }
     public bool Heal(int amount)
     {
