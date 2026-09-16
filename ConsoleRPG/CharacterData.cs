@@ -2,7 +2,6 @@
 
 internal static class CharacterData
 {
-    private static int _gold = 99999;
     public enum CharacterClass
     {
         Warrior,
@@ -11,14 +10,11 @@ internal static class CharacterData
         None = -1
     }
     public static CharacterClass CurrentCharacterClass { get; private set; } = CharacterClass.None;
-    public static void setCharacterClass(CharacterClass characterClass)
+    public static void SetCharacterClass(CharacterClass characterClass)
     {
         CurrentCharacterClass = characterClass;
     }
-    public static void setGold(int amount)
-    {
-        Gold = amount;
-    }
+    private static int _gold = 99999;
     public static int Gold
     {
         get { return _gold; }
@@ -26,6 +22,10 @@ internal static class CharacterData
         {
             _gold = Math.Clamp(value, 0, 99999);
         }
+    }
+    public static void SetGold(int amount)
+    {
+        Gold = amount;
     }
     public static void AddGold(int amount)
     {

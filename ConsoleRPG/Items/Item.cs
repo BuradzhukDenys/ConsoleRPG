@@ -48,7 +48,7 @@ internal abstract class Item
     }
     public bool CanStack { get; private set; } = false;
 
-    public Item(string name, int maxCount, int count)
+    public Item(string name, int maxCount, int count = 1)
     {
         Name = name;
         MaxCount = maxCount;

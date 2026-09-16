@@ -8,7 +8,7 @@ namespace ConsoleRPG.Items.Ammos;
 
 internal class Arrow : Ammo
 {
-    public Arrow(int count) : base("Arrow", count)
+    public Arrow() : base("Arrow")
     {
         DamageMultiplier = 1.05;
     }

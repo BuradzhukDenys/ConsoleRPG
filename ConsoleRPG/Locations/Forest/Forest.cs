@@ -33,12 +33,13 @@ internal class Forest : Location
         {
             if (Area[i] == 2)
             {
-                int enemyX = i % MapWidth;
-                int enemyY = i / MapWidth;
-
-                var enemyPos = new Vector2(enemyX, enemyY);
-
-                _enemiesInfo.Add(enemyPos, _enemies[k++]);
+                var enemyPos = new Vector2(i % MapWidth, i / MapWidth);
+                EnemiesInfo.Add(enemyPos, _enemies[k]);
+                k++;
+            }
+            else
+            {
+                Area[i] = 1;
             }
         }
     }

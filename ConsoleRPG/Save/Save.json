@@ -1,110 +1,136 @@
 {
-  "Character": {
-    "Inventory": {},
-    "CurrentWeapon": {
-      "Damage": 30,
-      "Name": "Iron sword",
+  "CurrentHealth": 110,
+  "MaxHealth": 120,
+  "CurrentWeaponType": "IronSword",
+  "CurrentArmorType": null,
+  "CurrentAmuletType": null,
+  "CurrentAmmoType": null,
+  "Inventory": [
+    {
       "Count": 1,
-      "MaxCount": 1,
-      "CanStack": false
+      "Type": "IronSword"
     },
-    "CurrentArmor": null,
-    "CurrentAmulet": null,
-    "IsDead": false,
-    "Name": "Warrior",
-    "Health": 120,
-    "MaxHealth": 120,
-    "Damage": 30,
-    "DamageMultiplier": 1,
-    "TotalDamage": 30,
-    "DamageReduction": 0
+    {
+      "Count": 2,
+      "Type": "HealingPotion"
+    }
+  ],
+  "Location": {
+    "Area": [
+      3,
+      0,
+      0,
+      1,
+      1,
+      9,
+      0,
+      1,
+      1,
+      0,
+      1,
+      0,
+      0,
+      1,
+      2,
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      2,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      0,
+      1,
+      2,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      0,
+      0
+    ],
+    "LocationType": "Forest",
+    "Enemies": {
+      "14": "Slime",
+      "22": "Slime",
+      "31": "Slime"
+    },
+    "ShopOffers": [
+      {
+        "Item": {
+          "Count": 1,
+          "Type": "LeatherArmor"
+        },
+        "Cost": 15,
+        "AvailableCount": 1
+      },
+      {
+        "Item": {
+          "Count": 1,
+          "Type": "GodArmor"
+        },
+        "Cost": 60,
+        "AvailableCount": 1
+      },
+      {
+        "Item": {
+          "Count": 1,
+          "Type": "FireAmulet"
+        },
+        "Cost": 30,
+        "AvailableCount": 1
+      },
+      {
+        "Item": {
+          "Count": 1,
+          "Type": "DamageAmulet"
+        },
+        "Cost": 20,
+        "AvailableCount": 1
+      },
+      {
+        "Item": {
+          "Count": 1,
+          "Type": "HealingPotion"
+        },
+        "Cost": 5,
+        "AvailableCount": 3
+      },
+      {
+        "Item": {
+          "Count": 1,
+          "Type": "UltraHammer"
+        },
+        "Cost": 50,
+        "AvailableCount": 1
+      },
+      {
+        "Item": {
+          "Count": 1,
+          "Type": "IronSword"
+        },
+        "Cost": 15,
+        "AvailableCount": 1
+      },
+      {
+        "Item": {
+          "Count": 1,
+          "Type": "Stick"
+        },
+        "Cost": 5,
+        "AvailableCount": 1
+      }
+    ]
   },
   "CharacterClass": 0,
-  "Location": {
-    "Shop": {
-      "Items": [
-        {
-          "Item": {
-            "Name": "Leather armor",
-            "Count": 1,
-            "MaxCount": 1,
-            "CanStack": false
-          },
-          "Cost": 15,
-          "Count": 1
-        },
-        {
-          "Item": {
-            "Name": "God armor",
-            "Count": 1,
-            "MaxCount": 1,
-            "CanStack": false
-          },
-          "Cost": 60,
-          "Count": 1
-        },
-        {
-          "Item": {
-            "Name": "Fire amulet",
-            "Count": 1,
-            "MaxCount": 1,
-            "CanStack": false
-          },
-          "Cost": 30,
-          "Count": 1
-        },
-        {
-          "Item": {
-            "Name": "Amulet of damage",
-            "Count": 1,
-            "MaxCount": 1,
-            "CanStack": false
-          },
-          "Cost": 20,
-          "Count": 1
-        },
-        {
-          "Item": {
-            "Name": "Healing potion",
-            "Count": 1,
-            "MaxCount": 5,
-            "CanStack": true
-          },
-          "Cost": 5,
-          "Count": 5
-        },
-        {
-          "Item": {
-            "Name": "Ultra hammer",
-            "Count": 1,
-            "MaxCount": 1,
-            "CanStack": false
-          },
-          "Cost": 50,
-          "Count": 1
-        },
-        {
-          "Item": {
-            "Name": "Iron sword",
-            "Count": 1,
-            "MaxCount": 1,
-            "CanStack": false
-          },
-          "Cost": 15,
-          "Count": 1
-        },
-        {
-          "Item": {
-            "Name": "Stick",
-            "Count": 1,
-            "MaxCount": 1,
-            "CanStack": false
-          },
-          "Cost": 5,
-          "Count": 1
-        }
-      ]
-    }
-  },
-  "Gold": 99999
+  "Gold": 99989
 }

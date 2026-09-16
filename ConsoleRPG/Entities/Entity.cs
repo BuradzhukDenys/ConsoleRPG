@@ -5,7 +5,7 @@ namespace ConsoleRPG.Entities;
 internal abstract class Entity
 {
     private int _health;
-    private string? _name;
+    private string _name = "";
     private int _damage = 0;
     private int _maxHealth;
     private double _damageReduction = 0.0;
@@ -14,7 +14,7 @@ internal abstract class Entity
     public bool IsDead { get; protected set; } = false;
     public string Name
     {
-        get { return _name!; }
+        get { return _name; }
         protected set
         {
             if (string.IsNullOrWhiteSpace(value))
@@ -28,7 +28,7 @@ internal abstract class Entity
     public int Health
     {
         get { return _health; }
-        protected set
+        internal set
         {
             _health = Math.Clamp(value, 0, MaxHealth);
 
@@ -41,7 +41,7 @@ internal abstract class Entity
     public int MaxHealth
     {
         get { return _maxHealth; }
-        protected set
+        internal set
         {
             if (value <= 0)
             {

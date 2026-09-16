@@ -13,7 +13,7 @@ internal abstract class Shop
 {
     public List<Offer> Items { get; protected set; } = [];
 
-    private Paginator<Offer> _paginator = new(6);
+    private readonly Paginator<Offer> _paginator = new(6);
     public void ShowShop()
     {
         Console.ResetColor();
@@ -46,7 +46,7 @@ internal abstract class Shop
             "9. Inventory\n" +
             "0. Back\n");
     }
-    //Fix, a problem, when i item is the reference and when i change count the same item in shop count change too
+    //Fix, a problem, when item is the reference and when i change count the same item in shop count change too
     public bool TryBuyItem(string input, out Item? item)
     {
         if (int.TryParse(input, out int slot) && slot >= 1 && slot <= _paginator.ItemsPerPage)
