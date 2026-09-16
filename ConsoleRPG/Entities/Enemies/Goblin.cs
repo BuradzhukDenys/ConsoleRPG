@@ -4,12 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ConsoleRPG.Items.Weapons.MeleeWeapons;
-
-internal class Stick : Weapon
+namespace ConsoleRPG.Entities.Enemies
 {
-    public Stick() : base("Stick")
+    internal class Goblin() : Enemy("Goblin", 55, 14, 19, 0.1)
     {
-        Damage = 10;
     }
 }

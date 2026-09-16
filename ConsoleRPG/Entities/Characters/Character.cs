@@ -65,6 +65,16 @@ internal abstract class Character : Entity
     {
         base.Attack(entity);
 
+        if (CurrentWeapon is IEffectProvider effectProvider)
+        {
+            var random = new Random();
+            
+            if (random.NextDouble() <= effectProvider.EffectChance)
+            {
+                entity.AddEffect(effectProvider.GetEffect());
+            }
+        }
+
         if (CurrentAmulet is IAttackAmulet attackAmulet)
         {
             switch (attackAmulet.AmuletEffectTarget)

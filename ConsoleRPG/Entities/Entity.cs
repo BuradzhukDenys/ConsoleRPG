@@ -179,7 +179,7 @@ internal abstract class Entity
     //Walk through effects list copy, if effect will add new effect program don't crash
     public void ApplyEffects()
     {
-        foreach (var effect in effects.ToList())
+        foreach (var effect in effects)
         {
             effect.Apply(this);
         }

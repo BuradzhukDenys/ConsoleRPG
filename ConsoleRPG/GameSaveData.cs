@@ -25,5 +25,6 @@ namespace ConsoleRPG
         public LocationSaveData? Location { get; set; }
         public CharacterData.CharacterClass CharacterClass { get; set; }
         public int Gold { get; set; }
+        public Queue<string> LocationsOrder { get; set; } = new();
     }
 }

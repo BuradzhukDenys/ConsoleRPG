@@ -10,6 +10,6 @@ internal class UltraHammer : Weapon
 {
     public UltraHammer() : base("Ultra hammer")
     {
-        Damage = 1000;
+        Damage = 95;
     }
 }

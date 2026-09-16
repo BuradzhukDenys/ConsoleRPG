@@ -14,5 +14,6 @@ namespace ConsoleRPG
         public string LocationType { get; set; } = "";
         public Dictionary<int, string> Enemies { get; set; } = [];
         public List<OfferSaveData> ShopOffers { get; set; } = [];
+        public bool IsLocationCompleted { get; set; }
     }
 }

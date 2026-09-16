@@ -4,12 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ConsoleRPG.Items.Weapons.MeleeWeapons;
-
-internal class Stick : Weapon
+namespace ConsoleRPG.Entities.Enemies
 {
-    public Stick() : base("Stick")
+    internal class Ent() : Enemy("Ent", 90, 25, 50, 0.25)
     {
-        Damage = 10;
     }
 }

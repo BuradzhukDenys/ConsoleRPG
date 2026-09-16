@@ -13,98 +13,80 @@
   ],
   "Location": {
     "Area": [
-      2,
-      0,
-      0,
-      0,
-      1,
-      1,
-      2,
-      1,
-      1,
-      2,
-      0,
-      0,
-      1,
-      0,
-      0,
-      1,
-      0,
-      1,
-      1,
-      2,
-      1,
-      0,
-      1,
-      9,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      1,
-      0,
-      1,
-      2,
-      1,
-      0,
-      1,
-      1,
-      2,
-      0,
-      1,
-      0,
-      1,
-      1,
-      2,
-      0,
-      1,
-      0,
-      2,
-      0,
-      0,
-      0,
-      1,
-      0,
       3,
       0,
       0,
+      1,
+      1,
+      1,
+      1,
+      0,
+      1,
+      1,
+      0,
+      0,
+      1,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0,
+      9,
+      0,
+      0,
+      1,
+      0,
+      0,
+      1,
+      0,
+      1,
+      1,
+      1,
+      1,
+      0,
+      1,
+      1,
       0,
       0,
       0,
-      2,
       0,
       0,
+      1,
+      1,
+      1,
+      1,
       0
     ],
-    "LocationType": "Cave",
-    "Enemies": {
-      "0": "Golem",
-      "6": "Goblin",
-      "9": "Skeleton",
-      "19": "Skeleton",
-      "33": "Skeleton",
-      "38": "Skeleton",
-      "44": "Goblin",
-      "48": "Golem",
-      "60": "Goblin"
-    },
+    "LocationType": "Forest",
+    "Enemies": {},
     "ShopOffers": [
       {
         "Item": {
           "Count": 1,
-          "Type": "MythrilArmor"
+          "Type": "LeatherArmor"
         },
-        "Cost": 34,
+        "Cost": 10,
         "AvailableCount": 1
       },
       {
         "Item": {
           "Count": 1,
-          "Type": "FireAmulet"
+          "Type": "IronArmor"
         },
-        "Cost": 32,
+        "Cost": 18,
+        "AvailableCount": 1
+      },
+      {
+        "Item": {
+          "Count": 1,
+          "Type": "HealthAmulet"
+        },
+        "Cost": 15,
         "AvailableCount": 1
       },
       {
@@ -112,31 +94,16 @@
           "Count": 1,
           "Type": "HealingPotion"
         },
-        "Cost": 12,
-        "AvailableCount": 5
-      },
-      {
-        "Item": {
-          "Count": 1,
-          "Type": "FireSword"
-        },
-        "Cost": 25,
-        "AvailableCount": 1
-      },
-      {
-        "Item": {
-          "Count": 1,
-          "Type": "BattleAxe"
-        },
-        "Cost": 40,
-        "AvailableCount": 1
+        "Cost": 5,
+        "AvailableCount": 8
       }
     ],
-    "IsLocationCompleted": false
+    "IsLocationCompleted": true
   },
   "CharacterClass": 0,
   "Gold": 99999,
   "LocationsOrder": [
+    "Cave",
     "Hell"
   ]
 }

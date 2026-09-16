@@ -14,11 +14,11 @@ namespace ConsoleRPG
         {
             WriteIndented = true
         };
-        private const string _saveDataPath = "D:\\Codes\\C# training\\ConsoleRPG\\ConsoleRPG\\Save\\Save.json";
+        public const string SaveDataPath = "D:\\Codes\\C# training\\ConsoleRPG\\ConsoleRPG\\Save\\Save.json";
         public static void SaveData(GameSaveData saveData)
         {
             var JsonSaveData = JsonSerializer.Serialize<GameSaveData>(saveData, _options);
-            File.WriteAllText(_saveDataPath, JsonSaveData);
+            File.WriteAllText(SaveDataPath, JsonSaveData);
 
             Console.ForegroundColor = ConsoleColor.DarkYellow;
             Console.WriteLine("Game saved");
@@ -26,7 +26,7 @@ namespace ConsoleRPG
         }
         public static GameSaveData? LoadData()
         {
-            if (!File.Exists(_saveDataPath))
+            if (!File.Exists(SaveDataPath))
             {
                 Console.ForegroundColor = ConsoleColor.DarkRed;
                 Console.WriteLine("No save file found!");
@@ -34,7 +34,7 @@ namespace ConsoleRPG
                 return null;
             }
 
-            var jsonSaveData = File.ReadAllText(_saveDataPath);
+            var jsonSaveData = File.ReadAllText(SaveDataPath);
 
             Console.ForegroundColor = ConsoleColor.DarkYellow;
             Console.WriteLine("Game loaded");

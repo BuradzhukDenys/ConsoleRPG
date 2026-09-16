@@ -72,6 +72,12 @@ internal class Archer : Character, IHasAmmo
         CurrentAmmo.Count--;
         base.Attack(entity);
 
+        var random = new Random();
+        if (CurrentAmmo is IEffectProvider effectAmmo && random.NextDouble() <= effectAmmo.EffectChance)
+        {
+            entity.AddEffect(effectAmmo.GetEffect());
+        }
+
         Console.ForegroundColor = ConsoleColor.Yellow;
         Console.WriteLine($"You consumed 1 {CurrentAmmo.Name}");
 

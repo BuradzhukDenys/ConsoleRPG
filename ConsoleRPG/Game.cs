@@ -12,6 +12,8 @@ using ConsoleRPG.Locations.Forest;
 using ConsoleRPG.Locations;
 using static ConsoleRPG.Locations.Location;
 using ConsoleRPG.Items.Weapons;
+using ConsoleRPG.Locations.Cave;
+using ConsoleRPG.Locations.Hell;
 
 namespace ConsoleRPG;
 
@@ -26,7 +28,8 @@ internal sealed class Game
         ItemAction,
         Map,
         Shop,
-        ShowStats
+        ShowStats,
+        StartGame
     }
     enum BattleState
     {
@@ -39,8 +42,11 @@ internal sealed class Game
         UniversalFactory<Item>.Initialize();
         UniversalFactory<Location>.Initialize();
         UniversalFactory<Character>.Initialize();
+
+        InitLocationsOrder();
     }
     private static Game? _instance;
+    private static bool SaveExist => File.Exists(SaveManager.SaveDataPath);
     public static Game? Instance
     {
         get
@@ -57,18 +63,39 @@ internal sealed class Game
         "3. Wizzard"
         ];
 
+    private readonly Queue<string> _locationsOrder = new();
+
     private GameSaveData? _saveData = null;
     private Character? _character = null;
     private Location? _location = null;
     private Enemy? _currentEnemy = null;
     private Shop? _currentShop = null;
+    private bool _isLocationCompleted = false;
     private string? playerInput;
 
-    private GameState currentGameState = GameState.SelectCharacterClass;
-    private GameState previousGameState = GameState.SelectCharacterClass;
+    private GameState currentGameState = GameState.StartGame;
+    private GameState previousGameState = GameState.StartGame;
     private BattleState currentBattleState = BattleState.PlayerTurn;
     private bool isGameRunning = true;
 
+    private void InitLocationsOrder()
+    {
+        _locationsOrder.Clear();
+
+        _locationsOrder.Enqueue(typeof(Forest).Name);
+        _locationsOrder.Enqueue(typeof(Cave).Name);
+        _locationsOrder.Enqueue(typeof(Hell).Name);
+    }
+    private void ResetGame()
+    {
+        _character = null;
+        _location = null;
+        _currentShop = null;
+        _currentEnemy = null;
+        CharacterData.SetCharacterClass(CharacterData.CharacterClass.None);
+
+        InitLocationsOrder();
+    }
     private void SelectCharacterClass()
     {
         if (CharacterData.CurrentCharacterClass != CharacterData.CharacterClass.None) return;
@@ -113,7 +140,7 @@ internal sealed class Game
             _character.OnCharacterDeath += GameOver;
             Console.Clear();
             previousGameState = GameState.SelectCharacterClass;
-            currentGameState = GameState.SelectTestField; // Test
+            currentGameState = GameState.Map;
         }
         Console.ResetColor();
     }
@@ -123,12 +150,14 @@ internal sealed class Game
         {
             _location.StartBattle -= InitiateBattle;
             _location.OpenShop -= InitiateShop;
+            _location.LocationCompleted -= LocationCompleted;
         }
 
         _location = location;
 
         _location.StartBattle += InitiateBattle;
         _location.OpenShop += InitiateShop;
+        _location.LocationCompleted += LocationCompleted;
 
         _currentShop = _location.Shop;
     }
@@ -159,8 +188,7 @@ internal sealed class Game
         Console.Write(
             $"1. Attack\n" +
             $"2. Open inventory\n" +
-            $"3. Give burn effect to enemy\n" +
-            $"4. Wait\n"
+            $"3. Wait\n"
             );
 
         playerInput = Console.ReadLine()!;
@@ -176,9 +204,6 @@ internal sealed class Game
                 currentGameState = GameState.Inventory;
                 break;
             case "3":
-                _currentEnemy?.AddEffect(new BurnEffect(5));
-                break;
-            case "4":
                 currentBattleState = BattleState.EnemyTurn;
                 break;
             default:
@@ -202,7 +227,7 @@ internal sealed class Game
             {
                 _currentEnemy.Attack(_character);
 
-                _character.ApplyEffects();
+                _character?.ApplyEffects();
                 currentBattleState = BattleState.PlayerTurn;
             }
         }
@@ -216,44 +241,91 @@ internal sealed class Game
 
         _character?.ApplyEffects();
     }
-    private void SelectTestField()
+    //private void SelectTestField()
+    //{
+    //    Console.ForegroundColor = ConsoleColor.Cyan;
+    //    Console.Write(
+    //        $"Select test field:\n" +
+    //        $"1. Battle\n" +
+    //        $"2. Inventory test\n" +
+    //        $"3. Map test\n"
+    //        );
+
+    //    playerInput = Console.ReadLine();
+
+    //    previousGameState = GameState.SelectTestField;
+    //    switch (playerInput)
+    //    {
+    //        case "1":
+    //            currentGameState = GameState.Battle;
+    //            break;
+    //        case "2":
+    //            currentGameState = GameState.Inventory;
+    //            break;
+    //        case "3":
+    //            currentGameState = GameState.Map;
+    //            break;
+    //        default:
+    //            Console.ForegroundColor = ConsoleColor.DarkRed;
+    //            Console.WriteLine("Unknown test");
+    //            Console.ResetColor();
+    //            break;
+    //    }
+    //    Console.Clear();
+    //    Console.ResetColor();
+    //}
+    private void TrySave()
     {
-        Console.ForegroundColor = ConsoleColor.Cyan;
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        Console.WriteLine("Are you want to save game?");
+
         Console.Write(
-            $"Select test field:\n" +
-            $"1. Battle\n" +
-            $"2. Inventory test\n" +
-            $"3. Map test\n"
-            );
+            "1. Yes\n" +
+            "2. No\n");
 
-        playerInput = Console.ReadLine();
+        playerInput = Console.ReadLine()!;
 
-        previousGameState = GameState.SelectTestField;
         switch (playerInput)
         {
             case "1":
-                currentGameState = GameState.Battle;
-                break;
-            case "2":
-                currentGameState = GameState.Inventory;
-                break;
-            case "3":
-                currentGameState = GameState.Map;
+                SaveGame();
                 break;
             default:
                 Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.WriteLine("Unknown test");
+                Console.WriteLine("Unknown action");
                 Console.ResetColor();
                 break;
         }
-        Console.Clear();
+
         Console.ResetColor();
+        Console.Clear();
+    }
+    private void LocationCompleted()
+    {
+        _isLocationCompleted = true;
+    }
+    private void NextLocation()
+    {
+        if (_locationsOrder.TryDequeue(out string? result) && result != null)
+        {
+            var newLocation = UniversalFactory<Location>.CreateObject(result);
+            if (newLocation != null)
+            {
+                SetupLocation(newLocation);
+
+                _isLocationCompleted = false;
+            }
+        }
     }
     private void MapExplore()
     {
         if (_location == null)
         {
-            SetupLocation(new Forest());
+            var newLocation = UniversalFactory<Location>.CreateObject(_locationsOrder.Dequeue());
+            if (newLocation != null)
+            {
+                SetupLocation(newLocation);
+            }
         }
 
         _location?.ShowMap();
@@ -264,8 +336,15 @@ internal sealed class Game
             "4. LEFT\n" +
             "5. Inventory\n" +
             "6. Stats\n" +
-            "9. Load game\n" +
-            "0. Save game\n");
+            "7. Save game\n" +
+            "8. Load game\n" +
+            "9. Main menu\n" +
+            "0. Exit\n");
+
+        if (_isLocationCompleted)
+        {
+            Console.WriteLine("11. Next location");
+        }
 
         playerInput = Console.ReadLine()!;
 
@@ -292,11 +371,25 @@ internal sealed class Game
             case "6":
                 currentGameState = GameState.ShowStats;
                 break;
-            case "9":
+            case "7":
+                SaveGame();
+                break;
+            case "8":
                 LoadSave();
                 break;
+            case "9":
+                TrySave();
+                currentGameState = GameState.StartGame;
+                break;
             case "0":
-                SaveGame();
+                TrySave();
+                isGameRunning = false;
+                break;
+            case "11":
+                if (_isLocationCompleted)
+                {
+                    NextLocation();
+                }
                 break;
             default:
                 Console.WriteLine("Unknown action");
@@ -327,7 +420,8 @@ internal sealed class Game
             LocationType = _location.GetType().Name,
             Area = _location.Area,
             Enemies = _location.GetEnemiesForSave(),
-            ShopOffers = offerSaveData
+            ShopOffers = offerSaveData,
+            IsLocationCompleted = _isLocationCompleted
         };
 
         _saveData = new GameSaveData()
@@ -342,7 +436,8 @@ internal sealed class Game
             Gold = CharacterData.Gold,
 
             Inventory = savedInventory,
-            Location = locationData
+            Location = locationData,
+            LocationsOrder = _locationsOrder
         };
 
         SaveManager.SaveData(_saveData);
@@ -351,13 +446,15 @@ internal sealed class Game
     {
         _saveData = SaveManager.LoadData();
 
-        if (_saveData == null) return;
+        if (_saveData == null || _saveData.Location == null) return;
 
         CharacterData.SetCharacterClass(_saveData.CharacterClass);
         CharacterData.SetGold(_saveData.Gold);
+        _isLocationCompleted = _saveData.Location.IsLocationCompleted;
 
         LoadCharacter();
         LoadLocation();
+        LoadLocationsOrder();
     }
     private void LoadCharacter()
     {
@@ -379,7 +476,7 @@ internal sealed class Game
 
         _character.CurrentArmor = startArmor;
         _character.CurrentAmulet = startAmulet;
-        
+
         if (_character is Archer archer)
         {
             var startAmmo = (Ammo?)UniversalFactory<Item>.CreateObject(_saveData.CurrentAmmoType);
@@ -406,6 +503,15 @@ internal sealed class Game
                 }
                 _character.Inventory.Items.Add(newItem);
             }
+        }
+    }
+    private void LoadLocationsOrder()
+    {
+        _locationsOrder.Clear();
+
+        foreach (var locationName in _saveData?.LocationsOrder ?? [])
+        {
+            _locationsOrder.Enqueue(locationName);
         }
     }
     private void LoadLocation()
@@ -555,17 +661,7 @@ internal sealed class Game
         Console.Write(
             $"8. Previous page\n" +
             $"9. Next page\n" +
-            $"0. Close\n" +
-            $"20. Add leather armor\n" +
-            $"21. Add god armor\n" +
-            $"22. Add new weapon\n" +
-            $"23. Add healing potion\n" +
-            $"25. Add new bow\n" +
-            $"24. Add arrow(X10)\n" +
-            $"26. Add god arrow(X10)\n" +
-            $"27. Add fire amulet\n" +
-            $"28. Add stick\n" +
-            $"29. Add amulet of damage\n"
+            $"0. Close\n"
             );
 
         playerInput = Console.ReadLine()!;
@@ -582,36 +678,6 @@ internal sealed class Game
             case "0":
                 currentGameState = previousGameState;
                 break;
-            case "20":
-                _character?.Inventory.AddItem(new LeatherArmor());
-                break;
-            case "21":
-                _character?.Inventory.AddItem(new GodArmor());
-                break;
-            case "22":
-                _character?.Inventory.AddItem(new UltraHammer());
-                break;
-            case "23":
-                _character?.Inventory.AddItem(new HealingPotion());
-                break;
-            case "24":
-                _character?.Inventory.AddItem(new Arrow { Count = 10 });
-                break;
-            case "25":
-                _character?.Inventory.AddItem(new GodBow());
-                break;
-            case "26":
-                _character?.Inventory.AddItem(new GodArrow { Count = 10 });
-                break;
-            case "27":
-                _character?.Inventory.AddItem(new FireAmulet());
-                break;
-            case "28":
-                _character?.Inventory.AddItem(new Stick());
-                break;
-            case "29":
-                _character?.Inventory.AddItem(new DamageAmulet());
-                break;
             default:
                 var item = _character?.Inventory.SelectItem(playerInput);
                 if (item != null)
@@ -622,19 +688,61 @@ internal sealed class Game
         }
         Console.ResetColor();
     }
+    private void StartGame()
+    {
+        Console.ForegroundColor = ConsoleColor.Yellow;
 
+        Console.WriteLine("1. New Game");
+
+        if (SaveExist)
+        {
+            Console.WriteLine("2. Load game");
+        }
+
+        playerInput = Console.ReadLine()!;
+
+        Console.Clear();
+        switch (playerInput)
+        {
+            case "1":
+                ResetGame();
+                currentGameState = GameState.SelectCharacterClass;
+                break;
+            case "2":
+                if (!SaveExist)
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                    Console.WriteLine("Unknown action!");
+                    Console.ResetColor();
+                    break;
+                }
+
+                LoadSave();
+                currentGameState = GameState.Map;
+                break;
+            default:
+                Console.ForegroundColor = ConsoleColor.DarkRed;
+                Console.WriteLine("Unknown action!");
+                Console.ResetColor();
+                break;
+        }
+        Console.ResetColor();
+    }
     public void Start()
     {
         while (isGameRunning)
         {
             switch (currentGameState)
             {
+                case GameState.StartGame:
+                    StartGame();
+                    break;
                 case GameState.SelectCharacterClass:
                     SelectCharacterClass();
                     break;
-                case GameState.SelectTestField:
-                    SelectTestField();
-                    break;
+                //case GameState.SelectTestField:
+                //    SelectTestField();
+                //    break;
                 case GameState.Battle:
                     Battle();
                     break;
@@ -662,7 +770,6 @@ internal sealed class Game
             }
         }
     }
-
     private void GameOver()
     {
         if (_character != null)
@@ -674,6 +781,12 @@ internal sealed class Game
         Console.ForegroundColor = ConsoleColor.DarkRed;
         Console.WriteLine("Game Over!");
         Console.ResetColor();
-        isGameRunning = false;
+
+        ResetGame();
+
+        Console.ReadLine();
+
+        currentGameState = GameState.StartGame;
+        previousGameState = GameState.StartGame;
     }
 }
