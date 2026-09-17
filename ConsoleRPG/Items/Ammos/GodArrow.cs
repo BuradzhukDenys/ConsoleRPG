@@ -10,6 +10,6 @@ internal class GodArrow : Ammo
 {
     public GodArrow() : base("God arrow")
     {
-        DamageMultiplier = 3;
+        DamageMultiplier = 1.65;
     }
 }

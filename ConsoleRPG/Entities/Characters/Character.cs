@@ -22,28 +22,6 @@ internal abstract class Character : Entity
         Damage = CurrentWeapon.Damage;
         Inventory.AddItem(CurrentWeapon);
     }
-
-    protected Character(string name, int health, int maxHealth, Weapon startWeapon, Armor startArmor, Amulet startAmulet, Inventory inventory) //Constructor for load from file
-    {
-        Name = name;
-        MaxHealth = maxHealth;
-        Health = health;
-        CurrentWeapon = startWeapon;
-        CurrentArmor = startArmor;
-        CurrentAmulet = startAmulet;
-        Damage = CurrentWeapon.Damage;
-
-        if (startArmor != null)
-        {
-            DamageReduction = CurrentArmor.DamageReduction;
-        }
-
-        if (CurrentAmulet is IPassiveAmulet)
-        {
-            CurrentAmulet.Equip(this);
-        }
-        this.Inventory = inventory;
-    }
     public bool Heal(int amount)
     {
         if (Health == MaxHealth)
@@ -64,6 +42,16 @@ internal abstract class Character : Entity
     public override void Attack(Entity entity)
     {
         base.Attack(entity);
+
+        if (CurrentWeapon is IEffectProvider effectProvider)
+        {
+            var random = new Random();
+            
+            if (random.NextDouble() <= effectProvider.EffectChance)
+            {
+                entity.AddEffect(effectProvider.GetEffect());
+            }
+        }
 
         if (CurrentAmulet is IAttackAmulet attackAmulet)
         {

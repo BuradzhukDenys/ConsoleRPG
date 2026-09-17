@@ -1,4 +1,6 @@
 ﻿using ConsoleRPG.Items;
+using ConsoleRPG.Items.Amulets;
+using ConsoleRPG.Items.Armor;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +17,10 @@ internal class Inventory
     public Inventory()
     {
         Items = [];
+
+        Items.Add(new HealthAmulet());
+        Items.Add(new DamageAmulet());
+        Items.Add(new LeatherArmor());
     }
     public Inventory(List<Item> items)
     {
@@ -89,16 +95,4 @@ internal class Inventory
     {
         _paginator.PreviousPage();
     }
-    //public bool CheckAmmos(string AmmoName)
-    //{
-    //    Ammo? selectedAmmo = (Ammo?)inventory.FirstOrDefault(item => item.Name == AmmoName);
-
-    //    return selectedAmmo != null;
-    //}
-
-
-    //public T? SelectItem<T>() where T : Item
-    //{
-    //    return inventory.OfType<T>().FirstOrDefault();
-    //}
 }

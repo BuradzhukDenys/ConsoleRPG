@@ -10,6 +10,6 @@ internal class GodArmor : Armor
 {
     public GodArmor() : base("God armor")
     {
-        DamageReduction = 100;
+        DamageReduction = 0.45;
     }
 }

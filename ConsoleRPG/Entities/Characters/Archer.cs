@@ -22,12 +22,6 @@ internal class Archer : Character, IHasAmmo
         AddDamageMultiplier(CurrentAmmo.DamageMultiplier);
         Inventory.AddItem(CurrentAmmo);
     }
-    public Archer(int health, int maxHealth, Weapon startWeapon, Armor startArmor, Amulet startAmulet, Ammo EquipedAmmo, Inventory inventory)
-        : base("Archer", health, maxHealth, startWeapon, startArmor, startAmulet, inventory)
-    {
-        CurrentAmmo = EquipedAmmo;
-        AddDamageMultiplier(CurrentAmmo.DamageMultiplier);
-    }
     public bool EquipAmmo(Ammo newAmmo)
     {
         if (CurrentAmmo != null && CurrentAmmo.GetType() == newAmmo.GetType())
@@ -71,6 +65,12 @@ internal class Archer : Character, IHasAmmo
 
         CurrentAmmo.Count--;
         base.Attack(entity);
+
+        var random = new Random();
+        if (CurrentAmmo is IEffectProvider effectAmmo && random.NextDouble() <= effectAmmo.EffectChance)
+        {
+            entity.AddEffect(effectAmmo.GetEffect());
+        }
 
         Console.ForegroundColor = ConsoleColor.Yellow;
         Console.WriteLine($"You consumed 1 {CurrentAmmo.Name}");

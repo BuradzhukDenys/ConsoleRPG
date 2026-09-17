@@ -17,6 +17,9 @@ namespace ConsoleRPG
     {
         public int CurrentHealth { get; set; }
         public int MaxHealth { get; set; }
+        public int Damage { get; set; }
+        public double DamageReduction { get; set; }
+        public double DamageMultiplayer { get; set; }
         public string CurrentWeaponType { get; set; } = "";
         public string CurrentArmorType { get; set; } = "";
         public string CurrentAmuletType { get; set; } = "";
@@ -25,5 +28,6 @@ namespace ConsoleRPG
         public LocationSaveData? Location { get; set; }
         public CharacterData.CharacterClass CharacterClass { get; set; }
         public int Gold { get; set; }
+        public Queue<string> LocationsOrder { get; set; } = new();
     }
 }

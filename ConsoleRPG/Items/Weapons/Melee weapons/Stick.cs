@@ -10,6 +10,6 @@ internal class Stick : Weapon
 {
     public Stick() : base("Stick")
     {
-        Damage = 1;
+        Damage = 10;
     }
 }

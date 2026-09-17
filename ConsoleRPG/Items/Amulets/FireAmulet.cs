@@ -30,7 +30,7 @@ internal class FireAmulet() : Amulet("Fire amulet"), IAttackAmulet
 
         if (chance > 0 && chance <= BurnChance)
         {
-            entity.AddEffect(new BurnEffect(2));
+            entity.AddEffect(new BurnEffect(2, 8));
             BurnChance = _baseBurnChance;
         }
         else
@@ -41,7 +41,7 @@ internal class FireAmulet() : Amulet("Fire amulet"), IAttackAmulet
     public override void ShowInfo()
     {
         Console.ForegroundColor = ConsoleColor.Blue;
-        Console.WriteLine($"Have chance in {BurnChance * 100}% to burn enemy for {_fireDurationTurns} {(_fireDurationTurns > 1 ? "turns" : "turn")}");
+        Console.WriteLine($"Have chance in {BurnChance * 100}% to burn enemy for {_fireDurationTurns} {(_fireDurationTurns > 1 ? "turns" : "turn")} (damage - {8})");
         Console.ResetColor();
     }
 }

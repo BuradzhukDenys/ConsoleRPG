@@ -6,6 +6,7 @@ internal abstract class Location(int width, List<int> map, Shop shop)
 {
     public event Action<Enemy>? StartBattle;
     public event Action? OpenShop;
+    public event Action? LocationCompleted;
     public enum Direction
     {
         UP,
@@ -112,9 +113,28 @@ internal abstract class Location(int width, List<int> map, Shop shop)
             int mapIndex = pos.Y * MapWidth + pos.X;
             Area[mapIndex] = 1;
         }
+
+        if (EnemiesInfo.Count == 0)
+        {
+            LocationCompleted?.Invoke();
+        }
     }
     public Dictionary<int, string> GetEnemiesForSave()
     {
         return new Dictionary<int, string>(EnemiesInfo.Select(kv => new KeyValuePair<int, string>(kv.Key.Y * MapWidth + kv.Key.X, kv.Value.GetType().Name)));
+    }
+
+    protected void InitEnemies(List<Enemy> enemies)
+    {
+        int k = 0;
+        for (int i = 0; i < Area.Count; i++)
+        {
+            if (Area[i] == 2)
+            {
+                var enemyPos = new Vector2(i % MapWidth, i / MapWidth);
+                EnemiesInfo.Add(enemyPos, enemies[k]);
+                k++;
+            }
+        }
     }
 }

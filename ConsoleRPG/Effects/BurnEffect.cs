@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ConsoleRPG.Effects;
-internal class BurnEffect(int duration) : Effect("Burn", duration)
+internal class BurnEffect(int duration, int damage) : Effect("Burn", duration)
 {
-    private readonly int _damage = 5;
     public override void InitializeMessage(Entity target)
     {
         Console.ForegroundColor = ConsoleColor.Yellow;
@@ -17,6 +17,6 @@ internal class BurnEffect(int duration) : Effect("Burn", duration)
     }
     public override void Action(Entity target)
     {
-        target.TakeDamage(_damage);
+        target.TakeDamage(damage);
     }
 }

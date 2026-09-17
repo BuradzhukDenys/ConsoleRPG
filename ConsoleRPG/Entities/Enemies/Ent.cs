@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ConsoleRPG;
-
-internal interface IRangedWeapon
+namespace ConsoleRPG.Entities.Enemies
 {
-    public int MeleeDamage { get; }
+    internal class Ent() : Enemy("Ent", 90, 25, 50, 0.25)
+    {
+    }
 }

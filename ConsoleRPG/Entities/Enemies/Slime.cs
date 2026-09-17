@@ -1,5 +1,5 @@
 ﻿namespace ConsoleRPG.Entities.Enemies;
 
-internal class Slime() : Enemy("Slime", 60, 10, 10)
+internal class Slime() : Enemy("Slime", 35, 10, 10, 0)
 {
 }

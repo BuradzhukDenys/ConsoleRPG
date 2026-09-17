@@ -8,9 +8,9 @@ namespace ConsoleRPG.Items.Weapons.RangedWeapons;
 
 internal class GodBow : Weapon, IRangedWeapon
 {
-    public int MeleeDamage => 250;
+    public int MeleeDamage => 35;
     public GodBow() : base("God bow")
     {
-        Damage = 1000;
+        Damage = 80;
     }
 }

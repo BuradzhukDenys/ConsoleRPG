@@ -10,6 +10,6 @@ internal class IronSword : Weapon
 {
     public IronSword() : base("Iron sword")
     {
-        Damage = 30;
+        Damage = 20;
     }
 }

@@ -1,29 +1,14 @@
 {
-  "CurrentHealth": 120,
+  "CurrentHealth": 95,
   "MaxHealth": 120,
-  "Damage": 10,
-  "DamageReduction": 0.1,
-  "DamageMultiplayer": 1.15,
-  "CurrentWeaponType": "Stick",
-  "CurrentArmorType": "LeatherArmor",
-  "CurrentAmuletType": "DamageAmulet",
+  "CurrentWeaponType": "UltraHammer",
+  "CurrentArmorType": "",
+  "CurrentAmuletType": "",
   "CurrentAmmoType": "",
   "Inventory": [
     {
       "Count": 1,
-      "Type": "HealthAmulet"
-    },
-    {
-      "Count": 1,
-      "Type": "DamageAmulet"
-    },
-    {
-      "Count": 1,
-      "Type": "LeatherArmor"
-    },
-    {
-      "Count": 1,
-      "Type": "Stick"
+      "Type": "UltraHammer"
     }
   ],
   "Location": {
@@ -33,39 +18,39 @@
       0,
       1,
       1,
-      2,
-      1,
-      0,
       1,
       1,
       0,
+      1,
+      1,
       0,
-      2,
+      0,
+      1,
       0,
       0,
       1,
-      2,
       1,
       1,
       1,
+      1,
+      1,
+      1,
+      0,
       9,
+      0,
+      0,
+      1,
+      0,
+      0,
       1,
       0,
       1,
-      0,
-      0,
-      2,
-      0,
-      0,
-      2,
-      0,
       1,
       1,
       1,
-      2,
       0,
       1,
-      2,
+      1,
       0,
       0,
       0,
@@ -74,20 +59,11 @@
       1,
       1,
       1,
-      2,
+      1,
       0
     ],
     "LocationType": "Forest",
-    "Enemies": {
-      "5": "Slime",
-      "12": "Goblin",
-      "16": "Slime",
-      "26": "Slime",
-      "29": "Ent",
-      "34": "Goblin",
-      "37": "Slime",
-      "46": "Goblin"
-    },
+    "Enemies": {},
     "ShopOffers": [
       {
         "Item": {
@@ -120,17 +96,9 @@
         },
         "Cost": 5,
         "AvailableCount": 8
-      },
-      {
-        "Item": {
-          "Count": 1,
-          "Type": "IronSword"
-        },
-        "Cost": 15,
-        "AvailableCount": 1
       }
     ],
-    "IsLocationCompleted": false
+    "IsLocationCompleted": true
   },
   "CharacterClass": 0,
   "Gold": 99999,

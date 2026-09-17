@@ -13,34 +13,25 @@ internal class Forest : Location
     private readonly List<Enemy> _enemies =
         [
             new Slime(),
+            new Goblin(),
             new Slime(),
             new Slime(),
-            new Slime()
+            new Ent(),
+            new Goblin(),
+            new Slime(),
+            new Goblin()
         ];
-    public Forest() : base(5, [
-            3, 0, 0, 1, 1,
-            1, 0, 1, 1, 0,
-            2, 0, 0, 1, 2,
-            1, 1, 9, 1, 0,
-            0, 0, 2, 0, 0,
-            0, 1, 1, 1, 0,
-            1, 2, 0, 0, 0,
-            0, 1, 1, 0, 0
+    public Forest() : base(6, [
+            3, 0, 0, 1, 1, 2,
+            1, 0, 1, 1, 0, 0,
+            2, 0, 0, 1, 2, 1,
+            1, 1, 9, 1, 0, 1,
+            0, 0, 2, 0, 0, 2,
+            0, 1, 1, 1, 2, 0,
+            1, 2, 0, 0, 0, 0,
+            0, 1, 1, 1, 2, 0
         ], new ForestShop())
     {
-        int k = 0;
-        for (int i = 0; i < Area.Count; i++)
-        {
-            if (Area[i] == 2)
-            {
-                var enemyPos = new Vector2(i % MapWidth, i / MapWidth);
-                EnemiesInfo.Add(enemyPos, _enemies[k]);
-                k++;
-            }
-            else
-            {
-                Area[i] = 1;
-            }
-        }
+        InitEnemies(_enemies);
     }
 }
