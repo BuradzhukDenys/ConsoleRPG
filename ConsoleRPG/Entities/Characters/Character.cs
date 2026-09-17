@@ -22,28 +22,6 @@ internal abstract class Character : Entity
         Damage = CurrentWeapon.Damage;
         Inventory.AddItem(CurrentWeapon);
     }
-
-    protected Character(string name, int health, int maxHealth, Weapon startWeapon, Armor startArmor, Amulet startAmulet, Inventory inventory) //Constructor for load from file
-    {
-        Name = name;
-        MaxHealth = maxHealth;
-        Health = health;
-        CurrentWeapon = startWeapon;
-        CurrentArmor = startArmor;
-        CurrentAmulet = startAmulet;
-        Damage = CurrentWeapon.Damage;
-
-        if (startArmor != null)
-        {
-            DamageReduction = CurrentArmor.DamageReduction;
-        }
-
-        if (CurrentAmulet is IPassiveAmulet)
-        {
-            CurrentAmulet.Equip(this);
-        }
-        this.Inventory = inventory;
-    }
     public bool Heal(int amount)
     {
         if (Health == MaxHealth)

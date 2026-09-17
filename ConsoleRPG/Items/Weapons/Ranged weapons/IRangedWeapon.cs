@@ -9,9 +9,4 @@ namespace ConsoleRPG;
 internal interface IRangedWeapon
 {
     public int MeleeDamage { get; }
-
-    //public bool CheckAmmos(Archer archer, string AmmoName)
-    //{
-    //    return archer.Inventory.CheckAmmos(AmmoName);
-    //}
 }

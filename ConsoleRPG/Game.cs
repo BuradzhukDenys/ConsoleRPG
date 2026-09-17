@@ -57,13 +57,7 @@ internal sealed class Game
         }
     }
 
-    private readonly List<string> classes = [
-        "1. Warrior",
-        "2. Archer",
-        "3. Wizzard"
-        ];
-
-    private readonly Queue<string> _locationsOrder = new();
+    private Queue<string> _locationsOrder = new();
 
     private GameSaveData? _saveData = null;
     private Character? _character = null;
@@ -92,6 +86,7 @@ internal sealed class Game
         _location = null;
         _currentShop = null;
         _currentEnemy = null;
+        _isLocationCompleted = false;
         CharacterData.SetCharacterClass(CharacterData.CharacterClass.None);
 
         InitLocationsOrder();
@@ -103,46 +98,38 @@ internal sealed class Game
         Console.ForegroundColor = ConsoleColor.Cyan;
         Console.WriteLine("Select character class");
 
-        foreach (string characterClass in classes)
+        var availableClasses = Enum.GetValues<CharacterData.CharacterClass>()
+            .Where(c => c != CharacterData.CharacterClass.None)
+            .ToList();
+
+        for (int i = 0; i < availableClasses.Count; i++)
         {
-            Console.WriteLine(characterClass);
+            Console.WriteLine($"{i + 1}. {availableClasses[i]}");
         }
         playerInput = Console.ReadLine()!;
+        Console.Clear();
 
-        switch (playerInput)
+        if (int.TryParse(playerInput, out int choice) && choice > 0 && choice <= availableClasses.Count)
         {
-            case "1":
-                _character = new Warrior();
-                CharacterData.SetCharacterClass(CharacterData.CharacterClass.Warrior);
-                break;
-            case "2":
-                _character = new Archer();
-                CharacterData.SetCharacterClass(CharacterData.CharacterClass.Archer);
-                break;
-            case "3":
-                //character = new Wizzard("Wizzard", 60, 35);
-                //CharacterData.CurrentCharacterClass = CharacterData.CharacterClass.Wizzard;
-                break;
-            default:
-                Console.Clear();
-                Console.ForegroundColor = ConsoleColor.DarkRed;
-                Console.WriteLine("Invalid choose");
-                Console.ResetColor();
-                break;
-        }
+            var selectedClass = availableClasses[choice - 1];
 
-        if (CharacterData.CurrentCharacterClass == CharacterData.CharacterClass.None)
-        {
-            Console.WriteLine("Class don't choose");
+            _character = UniversalFactory<Character>.CreateObject(selectedClass.ToString());
+
+            if (_character != null)
+            {
+                CharacterData.SetCharacterClass(selectedClass);
+                _character.OnCharacterDeath += GameOver;
+
+                previousGameState = GameState.SelectCharacterClass;
+                currentGameState = GameState.Map;
+            }
         }
-        else if (_character != null)
+        else
         {
-            _character.OnCharacterDeath += GameOver;
-            Console.Clear();
-            previousGameState = GameState.SelectCharacterClass;
-            currentGameState = GameState.Map;
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.WriteLine("Invalid choose");
+            Console.ResetColor();
         }
-        Console.ResetColor();
     }
     private void SetupLocation(Location location)
     {
@@ -319,13 +306,15 @@ internal sealed class Game
     }
     private void MapExplore()
     {
+        if (_isLocationCompleted && _locationsOrder.Count == 0)
+        {
+            Victory();
+            return;
+        }
+
         if (_location == null)
         {
-            var newLocation = UniversalFactory<Location>.CreateObject(_locationsOrder.Dequeue());
-            if (newLocation != null)
-            {
-                SetupLocation(newLocation);
-            }
+            NextLocation();
         }
 
         _location?.ShowMap();
@@ -428,6 +417,9 @@ internal sealed class Game
         {
             CurrentHealth = _character.Health,
             MaxHealth = _character.MaxHealth,
+            Damage = _character.Damage,
+            DamageMultiplayer = _character.DamageMultiplier,
+            DamageReduction = _character.DamageReduction,
             CurrentWeaponType = _character.CurrentWeapon.GetType().Name,
             CurrentArmorType = _character?.CurrentArmor?.GetType().Name ?? "",
             CurrentAmuletType = _character?.CurrentAmulet?.GetType().Name ?? "",
@@ -444,6 +436,8 @@ internal sealed class Game
     }
     private void LoadSave()
     {
+        if (!SaveExist) return;
+
         _saveData = SaveManager.LoadData();
 
         if (_saveData == null || _saveData.Location == null) return;
@@ -452,117 +446,14 @@ internal sealed class Game
         CharacterData.SetGold(_saveData.Gold);
         _isLocationCompleted = _saveData.Location.IsLocationCompleted;
 
-        LoadCharacter();
-        LoadLocation();
-        LoadLocationsOrder();
-    }
-    private void LoadCharacter()
-    {
-        if (_saveData == null) return;
+        _character = RestoreLoadedData.LoadCharacter(_saveData);
+        _locationsOrder = RestoreLoadedData.LoadLocationsOrder(_saveData);
 
-        _character = UniversalFactory<Character>.CreateObject(_saveData.CharacterClass.ToString());
-
-        if (_character == null) return;
-
-        _character.Health = _saveData.CurrentHealth;
-        _character.MaxHealth = _saveData.MaxHealth;
-
-        if (UniversalFactory<Item>.CreateObject(_saveData.CurrentWeaponType) is Weapon w)
+        _location = RestoreLoadedData.LoadLocation(_saveData);
+        if (_location != null)
         {
-            _character.CurrentWeapon = w;
+            SetupLocation(_location);
         }
-        var startArmor = (Armor?)UniversalFactory<Item>.CreateObject(_saveData.CurrentArmorType);
-        var startAmulet = (Amulet?)UniversalFactory<Item>.CreateObject(_saveData.CurrentAmuletType);
-
-        _character.CurrentArmor = startArmor;
-        _character.CurrentAmulet = startAmulet;
-
-        if (_character is Archer archer)
-        {
-            var startAmmo = (Ammo?)UniversalFactory<Item>.CreateObject(_saveData.CurrentAmmoType);
-            var savedAmmo = _saveData.Inventory.FirstOrDefault(it => it.Type == startAmmo?.GetType().Name);
-
-            if (startAmmo != null && savedAmmo != null)
-            {
-                startAmmo.Count = savedAmmo.Count;
-                archer.CurrentAmmo = startAmmo;
-            }
-        }
-
-        _character.Inventory.Items.Clear();
-
-        foreach (var itemSaveData in _saveData.Inventory)
-        {
-            Item? newItem = UniversalFactory<Item>.CreateObject(itemSaveData.Type);
-
-            if (newItem != null)
-            {
-                if (newItem.CanStack)
-                {
-                    newItem.Count = itemSaveData.Count;
-                }
-                _character.Inventory.Items.Add(newItem);
-            }
-        }
-    }
-    private void LoadLocationsOrder()
-    {
-        _locationsOrder.Clear();
-
-        foreach (var locationName in _saveData?.LocationsOrder ?? [])
-        {
-            _locationsOrder.Enqueue(locationName);
-        }
-    }
-    private void LoadLocation()
-    {
-        if (_saveData == null) return;
-
-        var newLocation = UniversalFactory<Location>.CreateObject(_saveData?.Location?.LocationType!)!;
-
-        if (newLocation == null) return;
-
-        newLocation.Area = _saveData?.Location?.Area ?? [];
-        newLocation.EnemiesInfo.Clear();
-
-        foreach (var kv in _saveData?.Location?.Enemies ?? [])
-        {
-            int enemyX = kv.Key % newLocation.MapWidth;
-            int enemyY = kv.Key / newLocation.MapWidth;
-
-            var enemyPos = new Vector2(enemyX, enemyY);
-
-            Enemy? newEnemy = UniversalFactory<Enemy>.CreateObject(kv.Value);
-
-            if (newEnemy != null)
-            {
-                newLocation.EnemiesInfo.Add(enemyPos, newEnemy);
-            }
-        }
-
-        newLocation.Shop.Items.Clear();
-        foreach (var offerData in _saveData?.Location?.ShopOffers ?? [])
-        {
-            if (offerData.Item == null) continue;
-
-            var restoredItem = UniversalFactory<Item>.CreateObject(offerData.Item?.Type!);
-
-            if (restoredItem != null)
-            {
-                restoredItem.Count = offerData.Item!.Count;
-
-                Offer newOffer = new()
-                {
-                    Item = restoredItem,
-                    Cost = offerData.Cost,
-                    Count = offerData.AvailableCount
-                };
-
-                newLocation.Shop.Items.Add(newOffer);
-            }
-        }
-
-        SetupLocation(newLocation);
     }
     private void Shop()
     {
@@ -604,11 +495,11 @@ internal sealed class Game
 
         Console.ResetColor();
         Console.WriteLine("-------------------------------");
-        Console.WriteLine("1. Back");
+        Console.WriteLine("0. Back");
 
         string input = Console.ReadLine()!;
 
-        if (input == "1")
+        if (input == "0")
         {
             currentGameState = previousGameState;
         }
@@ -769,6 +660,17 @@ internal sealed class Game
                     break;
             }
         }
+    }
+    private void Victory()
+    {
+        Console.Clear();
+        Console.WriteLine("Victory!");
+        TrySave();
+
+        Console.ReadLine();
+
+        currentGameState = GameState.StartGame;
+        previousGameState = GameState.StartGame;
     }
     private void GameOver()
     {

@@ -6,7 +6,6 @@ internal static class CharacterData
     {
         Warrior,
         Archer,
-        Wizzard,
         None = -1
     }
     public static CharacterClass CurrentCharacterClass { get; private set; } = CharacterClass.None;

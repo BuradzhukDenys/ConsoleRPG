@@ -1,110 +1,116 @@
 {
-  "CurrentHealth": 95,
+  "CurrentHealth": 120,
   "MaxHealth": 120,
-  "CurrentWeaponType": "UltraHammer",
-  "CurrentArmorType": "",
-  "CurrentAmuletType": "",
+  "Damage": 10,
+  "DamageReduction": 0.1,
+  "DamageMultiplayer": 1.15,
+  "CurrentWeaponType": "Stick",
+  "CurrentArmorType": "LeatherArmor",
+  "CurrentAmuletType": "DamageAmulet",
   "CurrentAmmoType": "",
   "Inventory": [
     {
       "Count": 1,
-      "Type": "UltraHammer"
+      "Type": "HealthAmulet"
+    },
+    {
+      "Count": 1,
+      "Type": "DamageAmulet"
+    },
+    {
+      "Count": 1,
+      "Type": "LeatherArmor"
+    },
+    {
+      "Count": 1,
+      "Type": "Stick"
     }
   ],
   "Location": {
     "Area": [
-      2,
-      0,
-      0,
-      0,
-      1,
-      1,
-      2,
-      1,
-      1,
-      2,
-      0,
-      0,
-      1,
-      0,
-      0,
-      1,
-      0,
-      1,
-      1,
-      2,
-      1,
-      0,
-      1,
-      9,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      1,
-      0,
-      1,
-      2,
-      1,
-      0,
-      1,
-      1,
-      2,
-      0,
-      1,
-      0,
-      1,
-      1,
-      2,
-      0,
-      1,
-      0,
-      2,
-      0,
-      0,
-      0,
-      1,
-      0,
       3,
       0,
       0,
+      1,
+      1,
+      2,
+      1,
       0,
+      1,
+      1,
       0,
       0,
       2,
       0,
       0,
+      1,
+      2,
+      1,
+      1,
+      1,
+      9,
+      1,
+      0,
+      1,
+      0,
+      0,
+      2,
+      0,
+      0,
+      2,
+      0,
+      1,
+      1,
+      1,
+      2,
+      0,
+      1,
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      2,
       0
     ],
-    "LocationType": "Cave",
+    "LocationType": "Forest",
     "Enemies": {
-      "0": "Golem",
-      "6": "Goblin",
-      "9": "Skeleton",
-      "19": "Skeleton",
-      "33": "Skeleton",
-      "38": "Skeleton",
-      "44": "Goblin",
-      "48": "Golem",
-      "60": "Goblin"
+      "5": "Slime",
+      "12": "Goblin",
+      "16": "Slime",
+      "26": "Slime",
+      "29": "Ent",
+      "34": "Goblin",
+      "37": "Slime",
+      "46": "Goblin"
     },
     "ShopOffers": [
       {
         "Item": {
           "Count": 1,
-          "Type": "MythrilArmor"
+          "Type": "LeatherArmor"
         },
-        "Cost": 34,
+        "Cost": 10,
         "AvailableCount": 1
       },
       {
         "Item": {
           "Count": 1,
-          "Type": "FireAmulet"
+          "Type": "IronArmor"
         },
-        "Cost": 32,
+        "Cost": 18,
+        "AvailableCount": 1
+      },
+      {
+        "Item": {
+          "Count": 1,
+          "Type": "HealthAmulet"
+        },
+        "Cost": 15,
         "AvailableCount": 1
       },
       {
@@ -112,23 +118,15 @@
           "Count": 1,
           "Type": "HealingPotion"
         },
-        "Cost": 12,
-        "AvailableCount": 5
+        "Cost": 5,
+        "AvailableCount": 8
       },
       {
         "Item": {
           "Count": 1,
-          "Type": "FireSword"
+          "Type": "IronSword"
         },
-        "Cost": 25,
-        "AvailableCount": 1
-      },
-      {
-        "Item": {
-          "Count": 1,
-          "Type": "BattleAxe"
-        },
-        "Cost": 40,
+        "Cost": 15,
         "AvailableCount": 1
       }
     ],
@@ -137,6 +135,7 @@
   "CharacterClass": 0,
   "Gold": 99999,
   "LocationsOrder": [
+    "Cave",
     "Hell"
   ]
 }

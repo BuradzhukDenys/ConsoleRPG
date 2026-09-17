@@ -43,10 +43,7 @@ internal abstract class Entity
         get { return _maxHealth; }
         internal set
         {
-            if (value <= 0)
-            {
-                throw new ArgumentOutOfRangeException("Max health can't be zero or less");
-            }
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(value);
 
             _maxHealth = value;
 
@@ -59,17 +56,14 @@ internal abstract class Entity
     public int Damage
     {
         get { return _damage; }
-        protected set
+        internal set
         {
-            if (value <= 0)
-            {
-                throw new ArgumentOutOfRangeException("Damage can't be zero or less");
-            }
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(value);
 
             _damage = value;
         }
     }
-    public double DamageMultiplier { get; private set; } = 1.0f;
+    public double DamageMultiplier { get; internal set; } = 1.0f;
     public int TotalDamage
     {
         get { return (int)Math.Ceiling(Damage * DamageMultiplier); }
@@ -179,7 +173,7 @@ internal abstract class Entity
     //Walk through effects list copy, if effect will add new effect program don't crash
     public void ApplyEffects()
     {
-        foreach (var effect in effects)
+        foreach (var effect in effects.ToList())
         {
             effect.Apply(this);
         }

@@ -12,6 +12,7 @@ namespace ConsoleRPG.Items.Amulets
         private const int _maxHealthBonus = 25;
         public void UnequipEffect(Character character)
         {
+            character.Health -= _maxHealthBonus;
             character.MaxHealth -= _maxHealthBonus;
         }
         public override bool Equip(Character character)
@@ -19,6 +20,7 @@ namespace ConsoleRPG.Items.Amulets
             if (base.Equip(character))
             {
                 character.MaxHealth += _maxHealthBonus;
+                character.Health += _maxHealthBonus;
                 return true;
             }
 
