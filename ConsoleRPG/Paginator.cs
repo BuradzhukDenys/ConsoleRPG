@@ -6,6 +6,11 @@ using System.Threading.Tasks;
 
 namespace ConsoleRPG
 {
+    /// <summary>
+    /// Class paginator for make pages of items in shop and inventory
+    /// </summary>
+    /// <typeparam name="T">Type of list items per page</typeparam>
+    /// <param name="ItemsPerPage"></param>
     internal class Paginator<T>(int ItemsPerPage)
     {
         public int CurrentPage { get; private set; } = 1;

@@ -5,7 +5,6 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-//Ready
 namespace ConsoleRPG
 {
     internal static class SaveManager

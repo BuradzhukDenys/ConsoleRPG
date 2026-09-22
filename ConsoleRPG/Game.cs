@@ -228,39 +228,6 @@ internal sealed class Game
 
         _character?.ApplyEffects();
     }
-    //private void SelectTestField()
-    //{
-    //    Console.ForegroundColor = ConsoleColor.Cyan;
-    //    Console.Write(
-    //        $"Select test field:\n" +
-    //        $"1. Battle\n" +
-    //        $"2. Inventory test\n" +
-    //        $"3. Map test\n"
-    //        );
-
-    //    playerInput = Console.ReadLine();
-
-    //    previousGameState = GameState.SelectTestField;
-    //    switch (playerInput)
-    //    {
-    //        case "1":
-    //            currentGameState = GameState.Battle;
-    //            break;
-    //        case "2":
-    //            currentGameState = GameState.Inventory;
-    //            break;
-    //        case "3":
-    //            currentGameState = GameState.Map;
-    //            break;
-    //        default:
-    //            Console.ForegroundColor = ConsoleColor.DarkRed;
-    //            Console.WriteLine("Unknown test");
-    //            Console.ResetColor();
-    //            break;
-    //    }
-    //    Console.Clear();
-    //    Console.ResetColor();
-    //}
     private void TrySave()
     {
         Console.ForegroundColor = ConsoleColor.Yellow;

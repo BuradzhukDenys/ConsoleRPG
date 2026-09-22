@@ -59,6 +59,8 @@ internal abstract class Shop
 
                 if (offer.Item != null && CharacterData.SpendGold(offer.Cost))
                 {
+                    //We use .Clone() because Item is a reference type.
+                    //This prevents modifying the item's count directly in the shop's inventory when purchased.
                     item = offer.Item.Clone();
                     Console.WriteLine($"{offer.Item.Name} is bought");
 

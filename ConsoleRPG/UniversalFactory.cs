@@ -8,9 +8,17 @@ using System.Threading.Tasks;
 
 namespace ConsoleRPG
 {
+    /// <summary>
+    /// A generic factory class to dynamically create object instances from save data.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     internal static class UniversalFactory<T> where T : class
     {
         private static readonly Dictionary<string, Type> _dict = [];
+        /// <summary>
+        /// Dynamically finds and registers all non-abstract subclasses of T using Reflection, 
+        /// eliminating the need for hardcoded switch-case statements.
+        /// </summary>
         public static void Initialize()
         {
             var itemTypes = Assembly.GetExecutingAssembly().GetTypes()
