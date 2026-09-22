@@ -20,7 +20,7 @@ This project was developed to practice and demonstrate knowledge of architectura
 
 * **Turn-based Combat:** Strategic battles featuring melee/ranged weapons, damage modifiers, and status effects (e.g., Burn effect with probability scaling).
 * **Dynamic Inventory & Shop:** Advanced item management with stacking, equipping, and paginated UI navigation.
-* **Map Exploration:** Grid-based map movement when you can find enemies and shops.
+* **Map Exploration:** Grid-based map movement where you can find enemies and shops.
 * **Save/Load System:** Full game state persistence using `System.Text.Json` serialization.
 
 ## Architecture & Design Patterns
