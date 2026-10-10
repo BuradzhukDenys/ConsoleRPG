@@ -45,7 +45,7 @@ internal abstract class Character : Entity
 
         if (CurrentWeapon is IEffectProvider effectProvider)
         {
-            var random = new Random();
+            var random = Random.Shared;
             
             if (random.NextDouble() <= effectProvider.EffectChance)
             {
