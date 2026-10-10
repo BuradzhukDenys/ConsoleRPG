@@ -93,7 +93,7 @@ internal abstract class Entity
     virtual public void Attack(Entity entity)
     {
         Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.WriteLine($"{Name} was attack {entity.Name} by {Damage} damage");
+        Console.WriteLine($"{Name} was attack {entity.Name} by {TotalDamage} damage");
         entity.TakeDamage(TotalDamage);
         Console.ResetColor();
     }

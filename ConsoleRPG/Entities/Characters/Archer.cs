@@ -66,7 +66,7 @@ internal class Archer : Character, IHasAmmo
         CurrentAmmo.Count--;
         base.Attack(entity);
 
-        var random = new Random();
+        var random = Game.random;
         if (CurrentAmmo is IEffectProvider effectAmmo && random.NextDouble() <= effectAmmo.EffectChance)
         {
             entity.AddEffect(effectAmmo.GetEffect());

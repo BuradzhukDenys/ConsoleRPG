@@ -13,7 +13,7 @@ internal static class CharacterData
     {
         CurrentCharacterClass = characterClass;
     }
-    private static int _gold = 99999;
+    private static int _gold = 0;
     public static int Gold
     {
         get { return _gold; }

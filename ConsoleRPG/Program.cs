@@ -1,3 +1,3 @@
 ﻿using ConsoleRPG;
 
-Game.Instance?.Start();
+Game.Instance.Start();

@@ -24,7 +24,7 @@ internal class FireAmulet() : Amulet("Fire amulet"), IAttackAmulet
     public IAttackAmulet.EffectTarget AmuletEffectTarget => IAttackAmulet.EffectTarget.Enemy;
     public void AmuletAction(Entity entity)
     {
-        Random rand = new();
+        Random rand = Random.Shared;
 
         double chance = rand.NextDouble();
 

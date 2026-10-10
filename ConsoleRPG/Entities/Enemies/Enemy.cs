@@ -26,7 +26,7 @@ internal abstract class Enemy : Entity
     }
     protected void TryApplyEffect(Entity target, Effect effect, double chance)
     {
-        var random = new Random();
+        var random = Game.random;
         if (random.NextDouble() <= chance)
         {
             target.AddEffect(effect);

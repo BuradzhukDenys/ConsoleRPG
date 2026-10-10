@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 namespace ConsoleRPG
 {
     /// <summary>
-    /// Class paginator for make pages of items in shop and inventory
+    /// A generic paginator to handle pagination for UI lists (shop, inventory)
     /// </summary>
-    /// <typeparam name="T">Type of list items per page</typeparam>
+    /// <typeparam name="T">The type of items being paginated.</typeparam>
     /// <param name="ItemsPerPage"></param>
     internal class Paginator<T>(int ItemsPerPage)
     {

@@ -13,7 +13,8 @@ namespace ConsoleRPG
         {
             WriteIndented = true
         };
-        public const string SaveDataPath = "D:\\Codes\\C# training\\ConsoleRPG\\ConsoleRPG\\Save\\Save.json";
+        private readonly static string SaveDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ConsoleRPG");
+        public static readonly string SaveDataPath = Path.Combine(SaveDirectory, "Save.json");
         public static void SaveData(GameSaveData saveData)
         {
             var JsonSaveData = JsonSerializer.Serialize<GameSaveData>(saveData, _options);
