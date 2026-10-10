@@ -38,5 +38,5 @@ This project was developed to practice and demonstrate knowledge of architectura
    ```bash
    git clone https://github.com/BuradzhukDenys/ConsoleRPG.git
    cd ConsoleRPG
-   dotnet run
+   dotnet run --project ConsoleRPG
    ```
