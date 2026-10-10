@@ -11,11 +11,16 @@ namespace ConsoleRPG
     /// </summary>
     /// <typeparam name="T">The type of items being paginated.</typeparam>
     /// <param name="ItemsPerPage"></param>
-    internal class Paginator<T>(int ItemsPerPage)
+    internal class Paginator<T>
     {
         public int CurrentPage { get; private set; } = 1;
-        public int ItemsPerPage { get; } = ItemsPerPage;
+        public int ItemsPerPage { get; }
         private const int _maxPages = 99;
+        public Paginator(int ItemsPerPage)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(ItemsPerPage);
+            this.ItemsPerPage = ItemsPerPage;
+        }
         public List<T> GetPage(List<T> allItems)
         {
             int totalPages = GetTotalPages(allItems.Count);

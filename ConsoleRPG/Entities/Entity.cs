@@ -86,9 +86,7 @@ internal abstract class Entity
     }
     public void RemoveDamageMultiplier(double multiplier)
     {
-        DamageMultiplier -= Math.Abs(multiplier);
-
-        DamageMultiplier = Math.Max(1.0, DamageMultiplier);
+        DamageMultiplier = Math.Max(1.0, DamageMultiplier - Math.Abs(multiplier));
     }
     virtual public void Attack(Entity entity)
     {
@@ -106,8 +104,9 @@ internal abstract class Entity
     }
     public void TakeDamage(int damage)
     {
+        int correctDamage = Math.Abs(damage);
         Console.ForegroundColor = ConsoleColor.Yellow;
-        int finaleDamage = (int)(damage - damage * DamageReduction);
+        int finaleDamage = (int)(correctDamage - correctDamage * DamageReduction);
         Health -= finaleDamage;
         Console.WriteLine($"{Name} was take damage by {finaleDamage} damage and have {Health} health");
         Console.ResetColor();
